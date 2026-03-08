@@ -23,9 +23,9 @@ export default function Header() {
             <Link href="/" className="text-foreground/80 hover:text-foreground text-sm transition">
               HOME
             </Link>
-            <a href="#how-it-works" className="text-foreground/80 hover:text-foreground text-sm transition">
-              SERVICES
-            </a>
+            <Link href="/device" className="text-foreground/80 hover:text-foreground text-sm transition">
+              DEVICE
+            </Link>
             <Link href="/contact" className="text-foreground/80 hover:text-foreground text-sm transition">
               CONTACT
             </Link>
@@ -53,9 +53,9 @@ export default function Header() {
             <Link href="/" className="block text-foreground/80 hover:text-foreground text-sm py-2" onClick={() => setMobileMenuOpen(false)}>
               HOME
             </Link>
-            <a href="#how-it-works" className="block text-foreground/80 hover:text-foreground text-sm py-2" onClick={() => setMobileMenuOpen(false)}>
-              SERVICES
-            </a>
+            <Link href="/device" className="block text-foreground/80 hover:text-foreground text-sm py-2" onClick={() => setMobileMenuOpen(false)}>
+              DEVICE
+            </Link>
             <Link href="/contact" className="block text-foreground/80 hover:text-foreground text-sm py-2" onClick={() => setMobileMenuOpen(false)}>
               CONTACT
             </Link>
