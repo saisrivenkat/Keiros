@@ -9,9 +9,11 @@ const KeirosLogo = () => {
   const sectionRef = useRef<HTMLElement | null>(null);
   const [progress, setProgress] = useState(0);
   const [viewportScale, setViewportScale] = useState(1);
-  const targetProgressRef = useRef(0);
-  const currentProgressRef = useRef(0);
+  const targetStepRef = useRef(0);
+  const currentStepRef = useRef(0);
   const rafRef = useRef<number | null>(null);
+  const stepLockRef = useRef(false);
+  const unlockTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     const updateViewportScale = () => {
@@ -21,56 +23,96 @@ const KeirosLogo = () => {
       setViewportScale(Math.max(fitted * 1.08, 0.34));
     };
 
-    const updateProgress = () => {
-      if (!sectionRef.current) return;
-
+    const isSectionLocked = () => {
+      if (!sectionRef.current) return false;
       const rect = sectionRef.current.getBoundingClientRect();
-      const vh = window.innerHeight;
-      const totalScrollable = Math.max(rect.height - vh, 1);
-      const scrolled = Math.min(Math.max(-rect.top, 0), totalScrollable);
-      targetProgressRef.current = scrolled / totalScrollable;
+      return rect.top <= 0 && rect.bottom >= window.innerHeight;
+    };
+
+    const unlockStep = () => {
+      stepLockRef.current = false;
+      if (unlockTimerRef.current) {
+        window.clearTimeout(unlockTimerRef.current);
+        unlockTimerRef.current = null;
+      }
+    };
+
+    const queueUnlock = () => {
+      if (unlockTimerRef.current) {
+        window.clearTimeout(unlockTimerRef.current);
+      }
+      unlockTimerRef.current = window.setTimeout(unlockStep, 520);
+    };
+
+    const handleWheel = (event: WheelEvent) => {
+      if (!isSectionLocked()) return;
+
+      const direction = Math.sign(event.deltaY);
+      if (direction === 0) return;
+
+      const canAdvance = direction > 0 && targetStepRef.current < 5;
+      const canRewind = direction < 0 && targetStepRef.current > 0;
+
+      if (!canAdvance && !canRewind) {
+        return;
+      }
+
+      event.preventDefault();
+      if (stepLockRef.current) return;
+
+      stepLockRef.current = true;
+      targetStepRef.current += direction > 0 ? 1 : -1;
+      queueUnlock();
     };
 
     const animate = () => {
-      const current = currentProgressRef.current;
-      const target = targetProgressRef.current;
-      const next = current + (target - current) * 0.12;
+      const current = currentStepRef.current;
+      const target = targetStepRef.current;
+      const next = current + (target - current) * 0.11;
 
-      currentProgressRef.current = next;
-      setProgress(next);
+      currentStepRef.current = next;
+      setProgress(next / 5);
       rafRef.current = requestAnimationFrame(animate);
     };
 
     updateViewportScale();
-    updateProgress();
-    window.addEventListener("scroll", updateProgress, { passive: true });
-    window.addEventListener("resize", updateProgress);
     window.addEventListener("resize", updateViewportScale);
+    window.addEventListener("wheel", handleWheel, { passive: false });
     rafRef.current = requestAnimationFrame(animate);
 
     return () => {
-      window.removeEventListener("scroll", updateProgress);
-      window.removeEventListener("resize", updateProgress);
       window.removeEventListener("resize", updateViewportScale);
+      window.removeEventListener("wheel", handleWheel);
+      if (unlockTimerRef.current) {
+        window.clearTimeout(unlockTimerRef.current);
+      }
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, []);
 
-  const eased = 0.5 - 0.5 * Math.cos(Math.PI * progress);
-  const spinProgressRaw = Math.min(progress / 0.78, 1);
-  const spinProgress = 0.5 - 0.5 * Math.cos(Math.PI * spinProgressRaw);
-  const handoff = Math.min(Math.max((progress - 0.72) / 0.28, 0), 1);
-  const rotateDeg = spinProgress * 720;
-  const scale = 1.08 + spinProgress * 1.35;
-  const translateY = -eased * 28;
-  const handoffScale = 1 + handoff * 0.45;
-  const handoffOpacity = Math.max(0, 1 - handoff * 1.6);
-  const handoffClip = 140 - handoff * 140;
-  const heroReveal = handoff * 140;
-  const hideLogo = handoff > 0.82;
+  const easeInOut = (value: number) => 0.5 - 0.5 * Math.cos(Math.PI * value);
+  const exactStep = progress * 5;
+  const stageOne = easeInOut(Math.min(exactStep, 1));
+  const stageTwo = easeInOut(Math.min(Math.max(exactStep - 1, 0), 1));
+  const stageThree = easeInOut(Math.min(Math.max(exactStep - 2, 0), 1));
+  const stageFour = easeInOut(Math.min(Math.max(exactStep - 3, 0), 1));
+  const stageFive = easeInOut(Math.min(Math.max(exactStep - 4, 0), 1));
+
+  const rotateDeg = (stageOne + stageTwo + stageThree + stageFour + stageFive) * 360;
+  const scale =
+    1.04 +
+    stageOne * 0.68 +
+    stageTwo * 0.52 +
+    stageThree * 0.76 +
+    stageFour * 0.96;
+  const translateY = -(stageOne * 14 + stageTwo * 20 + stageThree * 28 + stageFour * 12);
+  const logoOpacity = stageFour < 0.42 ? 1 : Math.max(0, 1 - (stageFour - 0.42) / 0.58);
+  const handoffClip = Math.max(0, 140 - (stageFour * 120 + stageFive * 20));
+  const heroReveal = Math.min(140, stageFour * 88 + stageFive * 52);
+  const hideLogo = stageFour > 0.94;
 
   return (
-    <section ref={sectionRef} className="relative h-[200vh] md:h-[220vh] bg-black">
+    <section ref={sectionRef} className="relative h-screen bg-black">
       <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center">
         <div
           className="absolute inset-0 z-0"
@@ -85,12 +127,12 @@ const KeirosLogo = () => {
         <div
           className="will-change-transform relative z-10"
           style={{
-            transform: `translateY(${translateY}px) rotate(${rotateDeg}deg) scale(${viewportScale * scale * handoffScale})`,
+            transform: `translateY(${translateY}px) rotate(${rotateDeg}deg) scale(${viewportScale * scale})`,
             transformOrigin: "50% 50%",
-            opacity: handoffOpacity,
+            opacity: logoOpacity,
             clipPath: `circle(${handoffClip}% at 50% 50%)`,
             WebkitClipPath: `circle(${handoffClip}% at 50% 50%)`,
-            filter: `blur(${handoff * 2}px)`,
+            filter: `blur(${stageFour * 2.4}px)`,
             visibility: hideLogo ? "hidden" : "visible",
             pointerEvents: hideLogo ? "none" : "auto",
           }}

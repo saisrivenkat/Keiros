@@ -5,8 +5,6 @@ import Link from 'next/link'
 export default function AddressHero() {
   return (
     <section id="hero" className="index-hero">
-      <div className="hero-grid" />
-
       <div className="hero-wrap">
         <div className="hero-content">
           <div className="hero-eyebrow">Precision Location Infrastructure</div>
@@ -22,7 +20,14 @@ export default function AddressHero() {
             location so deliveries arrive, ambulances find you, and visitors
             stop getting lost in the last hundred meters.
           </p>
-          
+          <div className="hero-actions">
+            <Link href="#contact" className="btn-primary">
+              Request Early Access
+            </Link>
+            <Link href="#solution" className="btn-secondary">
+              See How It Works
+            </Link>
+          </div>
         </div>
 
         <div className="hero-visual">
@@ -54,6 +59,8 @@ export default function AddressHero() {
 
       <style jsx>{`
         .index-hero {
+          --keiros-accent: #5bc9f0;
+          --keiros-accent-foreground: #050607;
           position: relative;
           overflow: hidden;
           background: var(--color-background);
@@ -62,32 +69,20 @@ export default function AddressHero() {
           font-family: 'DM Sans', sans-serif;
         }
 
-        .hero-grid {
-          position: absolute;
-          inset: 0;
-          z-index: 0;
-          background-image:
-            linear-gradient(color-mix(in oklab, var(--color-accent) 20%, transparent) 1px, transparent 1px),
-            linear-gradient(90deg, color-mix(in oklab, var(--color-accent) 20%, transparent) 1px, transparent 1px);
-          background-size: 60px 60px;
-          animation: gridDrift 20s linear infinite;
-        }
-
         .hero-wrap {
           position: relative;
           z-index: 2;
-          display: grid;
-          grid-template-columns: minmax(0, 1fr) 340px;
-          gap: 40px;
+          display: block;
           align-items: center;
           min-height: auto;
-          max-width: 1280px;
+          width: 100%;
           margin: 0 auto;
           padding: 112px 48px 44px;
         }
 
         .hero-content {
-          max-width: 620px;
+          max-width: none;
+          width: min(58vw, 760px);
         }
 
         .hero-eyebrow {
@@ -95,7 +90,7 @@ export default function AddressHero() {
           align-items: center;
           gap: 12px;
           margin-bottom: 28px;
-          color: var(--color-accent);
+          color: var(--keiros-accent);
           font-family: 'DM Mono', monospace;
           font-size: 0.75rem;
           letter-spacing: 0.2em;
@@ -106,25 +101,26 @@ export default function AddressHero() {
           content: '';
           width: 32px;
           height: 1px;
-          background: var(--color-accent);
+          background: var(--keiros-accent);
         }
 
         .hero-headline {
           margin: 0 0 32px;
           font-family: 'Bebas Neue', sans-serif;
-          font-size: 48px;
-          line-height: 0.96;
-          letter-spacing: 0.02em;
+          font-size: clamp(3.5rem, 6vw, 5.1rem);
+          font-weight: 700;
+          line-height: 0.92;
+          letter-spacing: 0.035em;
           max-width: 100%;
         }
 
         .hero-headline em {
           font-style: normal;
-          color: var(--color-accent);
+          color: var(--keiros-accent);
         }
 
         .hero-sub {
-          max-width: 560px;
+          max-width: none;
           margin: 0 0 32px;
           color: rgba(244, 242, 238, 0.7);
           font-size: 1rem;
@@ -151,13 +147,13 @@ export default function AddressHero() {
         }
 
         .btn-primary {
-          background: var(--color-accent);
-          color: var(--color-accent-foreground);
+          background: var(--keiros-accent);
+          color: var(--keiros-accent-foreground);
           font-weight: 600;
         }
 
         .btn-primary:hover {
-          background: color-mix(in oklab, var(--color-accent) 88%, white);
+          background: color-mix(in oklab, var(--keiros-accent) 88%, white);
           transform: translateY(-2px);
         }
 
@@ -172,9 +168,13 @@ export default function AddressHero() {
         }
 
         .hero-visual {
+          position: absolute;
+          top: 50%;
+          left: 75%;
           display: flex;
           align-items: center;
           justify-content: center;
+          transform: translate(-50%, -50%);
         }
 
         .hero-pin {
@@ -187,7 +187,7 @@ export default function AddressHero() {
           position: absolute;
           top: 50%;
           left: 50%;
-          border: 1px solid var(--color-accent);
+          border: 1px solid var(--keiros-accent);
           border-radius: 50%;
           transform: translate(-50%, -50%);
           animation: ringPulse 3s ease-out infinite;
@@ -216,7 +216,7 @@ export default function AddressHero() {
           width: 280px;
           height: 280px;
           animation-delay: 1.8s;
-          border-color: color-mix(in oklab, var(--color-accent) 30%, transparent);
+          border-color: color-mix(in oklab, var(--keiros-accent) 30%, transparent);
         }
 
         .pin-dot {
@@ -227,10 +227,10 @@ export default function AddressHero() {
           height: 18px;
           border-radius: 50%;
           transform: translate(-50%, -50%);
-          background: var(--color-accent);
+          background: var(--keiros-accent);
           box-shadow:
-            0 0 30px color-mix(in oklab, var(--color-accent) 85%, transparent),
-            0 0 60px color-mix(in oklab, var(--color-accent) 35%, transparent);
+            0 0 30px color-mix(in oklab, var(--keiros-accent) 85%, transparent),
+            0 0 60px color-mix(in oklab, var(--keiros-accent) 35%, transparent);
         }
 
         .pin-halo {
@@ -239,7 +239,7 @@ export default function AddressHero() {
           left: 50%;
           width: 56px;
           height: 56px;
-          border: 1px solid color-mix(in oklab, var(--color-accent) 45%, transparent);
+          border: 1px solid color-mix(in oklab, var(--keiros-accent) 45%, transparent);
           border-radius: 50%;
           transform: translate(-50%, -50%);
         }
@@ -249,9 +249,9 @@ export default function AddressHero() {
           top: calc(50% - 42px);
           left: calc(50% + 18px);
           padding: 6px 14px;
-          background: color-mix(in oklab, var(--color-accent) 12%, transparent);
-          border: 1px solid var(--color-accent);
-          color: var(--color-accent);
+          background: color-mix(in oklab, var(--keiros-accent) 12%, transparent);
+          border: 1px solid var(--keiros-accent);
+          color: var(--keiros-accent);
           font-family: 'DM Mono', monospace;
           font-size: 0.72rem;
           letter-spacing: 0.1em;
@@ -280,7 +280,7 @@ export default function AddressHero() {
 
         .stat-num {
           margin-bottom: 4px;
-          color: var(--color-accent);
+          color: var(--keiros-accent);
           font-family: 'Bebas Neue', sans-serif;
           font-size: 2.4rem;
           letter-spacing: 0.05em;
@@ -293,16 +293,6 @@ export default function AddressHero() {
           font-size: 0.7rem;
           letter-spacing: 0.14em;
           text-transform: uppercase;
-        }
-
-        @keyframes gridDrift {
-          0% {
-            transform: translate(0, 0);
-          }
-
-          100% {
-            transform: translate(60px, 60px);
-          }
         }
 
         @keyframes ringPulse {
@@ -329,9 +319,20 @@ export default function AddressHero() {
 
         @media (max-width: 1024px) {
           .hero-wrap {
-            grid-template-columns: 1fr;
-            gap: 28px;
             padding: 96px 24px 36px;
+          }
+
+          .hero-content {
+            width: 100%;
+          }
+
+          .hero-visual {
+            position: relative;
+            top: auto;
+            left: auto;
+            justify-content: center;
+            transform: none;
+            margin-top: 12px;
           }
         }
 
@@ -363,7 +364,7 @@ export default function AddressHero() {
           }
 
           .hero-headline {
-            font-size: 48px;
+            font-size: clamp(2.9rem, 12vw, 4rem);
             max-width: 100%;
           }
 

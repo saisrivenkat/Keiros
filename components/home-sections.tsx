@@ -1,10 +1,8 @@
 'use client'
 
-'use client'
-
 import Link from 'next/link'
 import { Building2, Check, Code2, MapPin, Package, ShieldAlert, Waypoints } from 'lucide-react'
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 
 const problemCards = [
   {
@@ -138,9 +136,15 @@ function SectionHeading({
 }
 
 export default function HomeSections() {
+  const howItWorksRef = useRef<HTMLElement | null>(null)
+  const [howItWorksProgress, setHowItWorksProgress] = useState(0)
+  const [desktopHowItWorks, setDesktopHowItWorks] = useState(false)
+  const howItWorksTargetRef = useRef(0)
+  const howItWorksCurrentRef = useRef(0)
+  const howItWorksRafRef = useRef<number | null>(null)
+
   useEffect(() => {
     const points = document.querySelectorAll('.solution-point')
-    const stepCards = document.querySelectorAll('.step')
     const howHeading = document.querySelector('.howitworks-section .section-headline')
     const observer = new IntersectionObserver(
       (entries) => {
@@ -154,11 +158,59 @@ export default function HomeSections() {
     )
 
     points.forEach((point) => observer.observe(point))
-    stepCards.forEach((step) => observer.observe(step))
     if (howHeading) observer.observe(howHeading)
 
     return () => observer.disconnect()
   }, [])
+
+  useEffect(() => {
+    const updateDesktopHowItWorks = () => {
+      setDesktopHowItWorks(window.innerWidth > 1024)
+    }
+
+    updateDesktopHowItWorks()
+    window.addEventListener('resize', updateDesktopHowItWorks)
+
+    return () => {
+      window.removeEventListener('resize', updateDesktopHowItWorks)
+    }
+  }, [])
+
+  useEffect(() => {
+    const updateHowItWorksProgress = () => {
+      if (!howItWorksRef.current) return
+
+      const rect = howItWorksRef.current.getBoundingClientRect()
+      const viewportHeight = window.innerHeight
+      const totalScrollable = Math.max(rect.height - viewportHeight, 1)
+      const scrolled = Math.min(Math.max(-rect.top, 0), totalScrollable)
+      howItWorksTargetRef.current = scrolled / totalScrollable
+    }
+
+    const animateHowItWorks = () => {
+      const current = howItWorksCurrentRef.current
+      const target = howItWorksTargetRef.current
+      const next = current + (target - current) * 0.12
+
+      howItWorksCurrentRef.current = next
+      setHowItWorksProgress(next)
+      howItWorksRafRef.current = requestAnimationFrame(animateHowItWorks)
+    }
+
+    updateHowItWorksProgress()
+    window.addEventListener('scroll', updateHowItWorksProgress, { passive: true })
+    window.addEventListener('resize', updateHowItWorksProgress)
+    howItWorksRafRef.current = requestAnimationFrame(animateHowItWorks)
+
+    return () => {
+      window.removeEventListener('scroll', updateHowItWorksProgress)
+      window.removeEventListener('resize', updateHowItWorksProgress)
+      if (howItWorksRafRef.current) cancelAnimationFrame(howItWorksRafRef.current)
+    }
+  }, [])
+
+  const activeStepFloat = howItWorksProgress * (steps.length - 1)
+  const activeStepIndex = Math.round(activeStepFloat)
 
   return (
     <>
@@ -248,25 +300,65 @@ export default function HomeSections() {
         Use Cases
       */}
 
-      <section id="howitworks" className="index-section-block howitworks-section">
+      <section id="howitworks" ref={howItWorksRef} className="index-section-block howitworks-section">
         <div className="section-inner">
           <div className="section-tag">How It Works</div>
     <h2 className="section-headline">SIMPLE TO DEPLOY.<br/><em>POWERFUL</em> AT SCALE.</h2>
 
 
-          <div className="steps">
-            {steps.map(({ title, description, icon: Icon }, index) => (
-              <div
-                key={title}
-                className="step"
-                style={{ transitionDelay: `${index * 120}ms` }}
-              >
-                <div className="step-num">{String(index + 1).padStart(2, '0')}</div>
-                <Icon className="step-icon" />
-                <h3>{title.toUpperCase()}</h3>
-                <p>{description}</p>
-              </div>
-            ))}
+          <div className="steps-viewport">
+            <div
+              className="steps-track"
+              style={
+                desktopHowItWorks
+                  ? ({
+                      transform: `translate3d(calc(-${activeStepFloat} * (min(78vw, 880px) + 28px)), 0, 0)`,
+                    } as CSSProperties)
+                  : undefined
+              }
+            >
+              {steps.map(({ title, description, icon: Icon }, index) => (
+                <article
+                  key={title}
+                  className={`step ${activeStepIndex === index ? 'active-step' : ''}`}
+                  style={(() => {
+                    if (!desktopHowItWorks) return {} as CSSProperties
+
+                    const distance = Math.abs(index - activeStepFloat)
+
+                    return {
+                      opacity: Math.max(0.42, 1 - distance * 0.22),
+                      transform: `translateY(${Math.min(distance * 10, 14)}px) scale(${1 - Math.min(distance * 0.04, 0.08)})`,
+                    } as CSSProperties
+                  })()}
+                >
+                  <div className="step-topline">
+                    <span className="step-chip">STEP {String(index + 1).padStart(2, '0')}</span>
+                    <span className="step-seq">{String(index + 1).padStart(2, '0')} / {String(steps.length).padStart(2, '0')}</span>
+                  </div>
+                  <div className="step-num">{String(index + 1).padStart(2, '0')}</div>
+                  <div className="step-icon-wrap">
+                    <Icon className="step-icon" />
+                  </div>
+                  <div className="step-body">
+                    <h3>{title.toUpperCase()}</h3>
+                    <p>{description}</p>
+                  </div>
+                  <div className="step-footer">
+                    <span className="step-rail" />
+                    <span className="step-footnote">Keiros deployment flow</span>
+                  </div>
+                </article>
+              ))}
+            </div>
+            <div className="steps-dots" aria-hidden="true">
+              {steps.map((step, index) => (
+                <span
+                  key={step.title}
+                  className={`steps-dot ${activeStepIndex === index ? 'active-dot' : ''}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -448,47 +540,49 @@ export default function HomeSections() {
       </section>
 
       <section id="contact" className="index-section contact-section">
-        <div className="section-tag">Get Early Access</div>
-    <h2 className="section-headline">BE FIRST.<br/>BE <em>PRECISE.</em></h2>
-    
-        <p className="contact-sub">
-          Keiros is onboarding early access partners across logistics,
-          emergency services, property operations, and developer platforms.
-        </p>
+        <div className="contact-inner">
+          <div className="section-tag">Get Early Access</div>
+      <h2 className="section-headline">BE FIRST.<br/>BE <em>PRECISE.</em></h2>
+      
+          <p className="contact-sub">
+            Keiros is onboarding early access partners across logistics,
+            emergency services, property operations, and developer platforms.
+          </p>
 
-        <form className="contact-form">
-          <div className="form-row">
-            <input type="text" className="form-input" placeholder="First Name" />
-            <input type="text" className="form-input" placeholder="Last Name" />
-          </div>
-          <input type="email" className="form-input" placeholder="Work Email" />
-          <input type="text" className="form-input" placeholder="Company / Organization" />
-          <select className="form-input" defaultValue="">
-            <option value="" disabled>
-              I am a...
-            </option>
-            <option>Property Manager / Owner</option>
-            <option>Logistics / Delivery Platform</option>
-            <option>Emergency Services / Government</option>
-            <option>Investor / VC</option>
-            <option>Software Developer</option>
-            <option>Other</option>
-          </select>
-          <textarea rows={4} className="form-input" placeholder="Tell us about your use case" />
-          <button type="submit" className="form-submit">
-            Request Early Access
-          </button>
-        </form>
+          <form className="contact-form">
+            <div className="form-row">
+              <input type="text" className="form-input" placeholder="First Name" />
+              <input type="text" className="form-input" placeholder="Last Name" />
+            </div>
+            <input type="email" className="form-input" placeholder="Work Email" />
+            <input type="text" className="form-input" placeholder="Company / Organization" />
+            <select className="form-input" defaultValue="">
+              <option value="" disabled>
+                I am a...
+              </option>
+              <option>Property Manager / Owner</option>
+              <option>Logistics / Delivery Platform</option>
+              <option>Emergency Services / Government</option>
+              <option>Investor / VC</option>
+              <option>Software Developer</option>
+              <option>Other</option>
+            </select>
+            <textarea rows={4} className="form-input" placeholder="Tell us about your use case" />
+            <button type="submit" className="form-submit">
+              Request Early Access
+            </button>
+          </form>
 
-        <div className="contact-alts">
-          <div>
-            Investor inquiries: <a href="mailto:invest@keiros.io">invest@keiros.io</a>
-          </div>
-          <div>
-            Partnerships: <a href="mailto:partners@keiros.io">partners@keiros.io</a>
-          </div>
-          <div>
-            Press: <a href="mailto:press@keiros.io">press@keiros.io</a>
+          <div className="contact-alts">
+            <div>
+              Investor inquiries: <a href="mailto:invest@keiros.io">invest@keiros.io</a>
+            </div>
+            <div>
+              Partnerships: <a href="mailto:partners@keiros.io">partners@keiros.io</a>
+            </div>
+            <div>
+              Press: <a href="mailto:press@keiros.io">press@keiros.io</a>
+            </div>
           </div>
         </div>
       </section>
@@ -497,6 +591,8 @@ export default function HomeSections() {
         .index-banner-section,
         .index-section,
         .index-section-block {
+          --keiros-accent: #5bc9f0;
+          --keiros-accent-foreground: #050607;
           color: var(--color-foreground);
           font-family: 'DM Sans', sans-serif;
         }
@@ -513,6 +609,20 @@ export default function HomeSections() {
         .section-inner {
           max-width: 1280px;
           margin: 0 auto;
+        }
+
+        .developers-section {
+          width: 100vw;
+          max-width: none;
+          margin-left: calc(50% - 50vw);
+          margin-right: calc(50% - 50vw);
+        }
+
+        .contact-section {
+          width: 100vw;
+          max-width: none;
+          margin-left: calc(50% - 50vw);
+          margin-right: calc(50% - 50vw);
         }
 
         .banner-frame {
@@ -553,11 +663,75 @@ export default function HomeSections() {
         }
 
         .solution-section {
-          background: linear-gradient(180deg, var(--color-background) 0%, color-mix(in oklab, var(--color-background) 78%, var(--color-accent) 22%) 100%);
+          background: linear-gradient(180deg, var(--color-background) 0%, color-mix(in oklab, var(--color-background) 78%, var(--keiros-accent) 22%) 100%);
         }
 
         .howitworks-section {
           background: #0a0c0f;
+          min-height: 340vh;
+        }
+
+        .howitworks-section .section-inner {
+          position: sticky;
+          top: 0;
+          display: flex;
+          min-height: 100vh;
+          flex-direction: column;
+          justify-content: center;
+        }
+
+        .developers-section {
+          position: relative;
+          overflow: hidden;
+          isolation: isolate;
+          background: #000;
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .developers-section::before {
+          content: '';
+          position: absolute;
+          top: -224px;
+          right: -112px;
+          width: 1080px;
+          height: 400px;
+          border-radius: 9999px;
+          pointer-events: none;
+          background: linear-gradient(to right, #5bc9f0 0%, #053949 100%);
+          opacity: 1;
+          filter: saturate(1.45) brightness(1.12) blur(64px);
+        }
+
+        .developers-section::after {
+          content: '';
+          position: absolute;
+          top: -176px;
+          right: 0;
+          width: 860px;
+          height: 360px;
+          border-radius: 9999px;
+          pointer-events: none;
+          background: linear-gradient(to right, #5bc9f0 0%, #053949 100%);
+          opacity: 0.92;
+          mix-blend-mode: screen;
+          filter: blur(48px);
+        }
+
+        .developers-section .section-tag,
+        .developers-section .section-headline,
+        .developers-section .dev-layout {
+          max-width: 1280px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .developers-section .section-tag,
+        .developers-section .section-headline {
+          position: relative;
+          z-index: 2;
+          padding-left: 48px;
+          padding-right: 48px;
         }
 
         .howitworks-section .section-headline {
@@ -597,14 +771,16 @@ export default function HomeSections() {
         .section-headline {
           margin: 0 0 32px;
           font-family: 'Bebas Neue', sans-serif;
-          font-size: 48px;
-          line-height: 1;
-          letter-spacing: 0.02em;
+          font-size: clamp(3.5rem, 6vw, 5.25rem);
+          font-weight: 700;
+          line-height: 0.92;
+          letter-spacing: 0.035em;
+          text-wrap: balance;
         }
 
         .section-headline em {
           font-style: normal;
-          color: var(--color-accent);
+          color: var(--keiros-accent);
         }
 
         .problem-grid,
@@ -622,6 +798,8 @@ export default function HomeSections() {
 
         .dev-layout {
           grid-template-columns: 1fr 1fr;
+          position: relative;
+          z-index: 2;
         }
 
         .solution-layout {
@@ -694,7 +872,7 @@ export default function HomeSections() {
           position: relative;
           z-index: 1;
           margin-bottom: 18px;
-          color: color-mix(in oklab, var(--color-accent) 88%, white 12%);
+          color: color-mix(in oklab, var(--keiros-accent) 88%, white 12%);
         }
 
         .problem-icon.urgent-icon {
@@ -734,7 +912,7 @@ export default function HomeSections() {
           position: relative;
           width: 220px;
           height: 360px;
-          border: 2px solid color-mix(in oklab, var(--color-accent) 20%, transparent);
+          border: 2px solid color-mix(in oklab, var(--keiros-accent) 20%, transparent);
         }
 
         .building-label {
@@ -758,8 +936,8 @@ export default function HomeSections() {
           display: flex;
           align-items: center;
           padding: 0 16px;
-          border-bottom: 1px solid color-mix(in oklab, var(--color-accent) 15%, transparent);
-          color: color-mix(in oklab, var(--color-accent) 40%, transparent);
+          border-bottom: 1px solid color-mix(in oklab, var(--keiros-accent) 15%, transparent);
+          color: color-mix(in oklab, var(--keiros-accent) 40%, transparent);
           font-family: 'DM Mono', monospace;
           font-size: 0.65rem;
           letter-spacing: 0.1em;
@@ -779,7 +957,7 @@ export default function HomeSections() {
 
         .floor:nth-child(5) {
           bottom: 120px;
-          background: color-mix(in oklab, var(--color-accent) 4%, transparent);
+          background: color-mix(in oklab, var(--keiros-accent) 4%, transparent);
         }
 
         .floor:nth-child(6) {
@@ -791,9 +969,9 @@ export default function HomeSections() {
         }
 
         .floor.active {
-          color: var(--color-accent);
-          background: color-mix(in oklab, var(--color-accent) 8%, transparent);
-          border-left: 3px solid var(--color-accent);
+          color: var(--keiros-accent);
+          background: color-mix(in oklab, var(--keiros-accent) 8%, transparent);
+          border-left: 3px solid var(--keiros-accent);
         }
 
         .floor-pin {
@@ -801,8 +979,8 @@ export default function HomeSections() {
           height: 8px;
           margin-left: auto;
           border-radius: 50%;
-          background: var(--color-accent);
-          box-shadow: 0 0 8px var(--color-accent);
+          background: var(--keiros-accent);
+          box-shadow: 0 0 8px var(--keiros-accent);
           animation: blink 1.4s ease-in-out infinite;
         }
 
@@ -812,8 +990,8 @@ export default function HomeSections() {
           right: -60px;
           padding: 10px 16px;
           white-space: nowrap;
-          background: var(--color-accent);
-          color: var(--color-accent-foreground);
+          background: var(--keiros-accent);
+          color: var(--keiros-accent-foreground);
           font-family: 'DM Mono', monospace;
           font-size: 0.7rem;
           font-weight: 500;
@@ -827,7 +1005,7 @@ export default function HomeSections() {
           left: -8px;
           transform: translateY(-50%);
           border: 8px solid transparent;
-          border-right-color: var(--color-accent);
+          border-right-color: var(--keiros-accent);
           border-left: none;
         }
 
@@ -856,7 +1034,7 @@ export default function HomeSections() {
 
         .point-num {
           min-width: 48px;
-          color: color-mix(in oklab, var(--color-accent) 15%, transparent);
+          color: color-mix(in oklab, var(--keiros-accent) 15%, transparent);
           font-family: 'Bebas Neue', sans-serif;
           font-size: 3rem;
           line-height: 1;
@@ -864,7 +1042,7 @@ export default function HomeSections() {
         }
 
         .solution-point:hover .point-num {
-          color: var(--color-accent);
+          color: var(--keiros-accent);
         }
 
         .point-content h3,
@@ -891,96 +1069,217 @@ export default function HomeSections() {
           font-size: 0.95rem;
         }
 
-        .steps {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 2px;
-          margin-top: 64px;
+        .steps-viewport {
           position: relative;
+          margin-top: 64px;
+          min-height: 560px;
+          overflow: hidden;
+          width: 100vw;
+          margin-left: calc(50% - 50vw);
+          margin-right: calc(50% - 50vw);
+        }
+
+        .steps-track {
+          display: flex;
+          align-items: stretch;
+          gap: 28px;
+          padding-left: calc((100vw - min(78vw, 880px)) / 2);
+          padding-right: calc((100vw - min(78vw, 880px)) / 2);
+          will-change: transform;
+          transition: transform 0.18s linear;
         }
 
         .step {
           position: relative;
-          padding: 40px 32px;
-          background: #1c1f23;
+          flex: 0 0 min(78vw, 880px);
+          min-height: 500px;
+          padding: 34px 38px 38px;
+          background:
+            radial-gradient(circle at top right, color-mix(in oklab, var(--keiros-accent) 18%, transparent), transparent 34%),
+            linear-gradient(180deg, rgba(18, 25, 34, 0.98), rgba(8, 12, 17, 1));
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 34px;
+          box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.05),
+            0 28px 80px rgba(0, 0, 0, 0.32);
           overflow: hidden;
-          opacity: 0;
-          transform: translateY(56px) scale(0.985);
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          transform-origin: center center;
           transition:
-            opacity 0.75s ease,
-            transform 0.75s cubic-bezier(0.22, 1, 0.36, 1),
-            background 0.25s ease;
+            opacity 0.35s ease,
+            transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+            background 0.35s ease,
+            border-color 0.35s ease,
+            box-shadow 0.35s ease;
+          will-change: transform, opacity;
         }
 
         .step::before {
           content: '';
           position: absolute;
-          inset: 0 0 auto 0;
-          height: 2px;
-          background: linear-gradient(90deg, var(--color-accent), transparent 78%);
-          transform: scaleX(0);
-          transform-origin: left;
-          transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+          inset: 0;
+          background:
+            linear-gradient(135deg, rgba(255, 255, 255, 0.04), transparent 38%),
+            radial-gradient(circle at bottom left, color-mix(in oklab, var(--keiros-accent) 10%, transparent), transparent 32%);
+          pointer-events: none;
         }
 
         .step::after {
           content: '';
           position: absolute;
-          inset: 0;
-          background: radial-gradient(circle at top left, color-mix(in oklab, var(--color-accent) 14%, transparent), transparent 42%);
-          opacity: 0;
-          transition: opacity 0.35s ease;
+          inset: auto 0 0 0;
+          height: 4px;
+          background: linear-gradient(90deg, var(--keiros-accent), transparent 70%);
+          opacity: 0.4;
           pointer-events: none;
         }
 
-        .step.visible {
+        .step.active-step {
+          background:
+            radial-gradient(circle at top right, color-mix(in oklab, var(--keiros-accent) 22%, transparent), transparent 34%),
+            linear-gradient(180deg, rgba(22, 32, 42, 1), rgba(10, 14, 19, 1));
+          border-color: color-mix(in oklab, var(--keiros-accent) 24%, rgba(255, 255, 255, 0.12));
+          box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.06),
+            0 34px 90px rgba(0, 0, 0, 0.38);
+        }
+
+        .step.active-step::after {
           opacity: 1;
-          transform: translateY(0) scale(1);
         }
 
-        .step.visible::before {
-          transform: scaleX(1);
+        .step-topline {
+          position: relative;
+          z-index: 1;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+          margin-bottom: 18px;
         }
 
-        .step:hover {
-          background: color-mix(in oklab, #1c1f23 86%, var(--color-accent) 14%);
-          transform: translateY(-6px);
+        .step-chip,
+        .step-seq,
+        .step-footnote {
+          font-family: 'DM Mono', monospace;
+          font-size: 0.72rem;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
         }
 
-        .step:hover::after {
-          opacity: 1;
+        .step-chip {
+          padding: 10px 14px;
+          border: 1px solid color-mix(in oklab, var(--keiros-accent) 18%, rgba(255, 255, 255, 0.08));
+          border-radius: 999px;
+          color: var(--keiros-accent);
+          background: color-mix(in oklab, var(--keiros-accent) 6%, transparent);
+        }
+
+        .step-seq {
+          color: rgba(255, 255, 255, 0.42);
         }
 
         .step-num {
-          margin-bottom: 16px;
-          color: color-mix(in oklab, var(--color-accent) 8%, transparent);
+          position: absolute;
+          top: 88px;
+          right: 34px;
+          color: color-mix(in oklab, var(--keiros-accent) 12%, transparent);
           font-family: 'Bebas Neue', sans-serif;
-          font-size: 4rem;
-          line-height: 1;
+          font-size: clamp(5.5rem, 10vw, 8rem);
+          line-height: 0.85;
+          letter-spacing: 0.04em;
+        }
+
+        .step-icon-wrap {
+          position: relative;
+          z-index: 1;
+          display: grid;
+          width: 76px;
+          height: 76px;
+          place-items: center;
+          margin-bottom: 26px;
+          border: 1px solid color-mix(in oklab, var(--keiros-accent) 22%, rgba(255, 255, 255, 0.1));
+          border-radius: 24px;
+          background: linear-gradient(180deg, rgba(10, 17, 24, 0.96), rgba(5, 9, 13, 0.96));
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
         }
 
         .step-icon {
           position: relative;
           z-index: 1;
-          margin-bottom: 16px;
-          color: var(--color-accent);
-          transition: transform 0.3s ease, color 0.3s ease;
+          color: var(--keiros-accent);
+          transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), color 0.3s ease;
         }
 
         .step h3 {
-          font-size: 1.4rem;
+          font-size: clamp(2rem, 3.5vw, 3rem);
+          line-height: 0.95;
+          max-width: 70%;
+          margin-bottom: 14px;
         }
 
-        .step:hover .step-icon {
-          transform: translateY(-2px) scale(1.06);
+        .step.active-step .step-icon {
+          transform: translateY(-2px) scale(1.08);
         }
 
-        .step:hover .step-num {
-          color: color-mix(in oklab, var(--color-accent) 22%, transparent);
+        .step.active-step .step-num {
+          color: color-mix(in oklab, var(--keiros-accent) 20%, transparent);
         }
 
         .step p {
-          font-size: 0.88rem;
+          max-width: 58ch;
+          font-size: 1rem;
+          line-height: 1.75;
+        }
+
+        .step-body {
+          position: relative;
+          z-index: 1;
+          padding-top: 18px;
+          padding-bottom: 28px;
+        }
+
+        .step-footer {
+          position: relative;
+          z-index: 1;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 20px;
+          padding-top: 20px;
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .step-rail {
+          display: block;
+          flex: 1;
+          height: 1px;
+          background: linear-gradient(90deg, var(--keiros-accent), rgba(255, 255, 255, 0.08));
+        }
+
+        .steps-dots {
+          position: absolute;
+          left: 50%;
+          bottom: 18px;
+          z-index: 12;
+          display: flex;
+          gap: 10px;
+          transform: translateX(-50%);
+        }
+
+        .steps-dot {
+          width: 10px;
+          height: 10px;
+          border-radius: 999px;
+          background: rgba(255, 255, 255, 0.18);
+          transition: transform 0.3s ease, background 0.3s ease;
+        }
+
+        .steps-dot.active-dot {
+          background: var(--keiros-accent);
+          transform: scale(1.3);
         }
 
         .dev-text p {
@@ -1003,19 +1302,24 @@ export default function HomeSections() {
           align-items: flex-start;
           gap: 16px;
           padding: 16px;
-          background: #1c1f23;
+          background: linear-gradient(180deg, rgba(8, 13, 18, 0.86), rgba(5, 9, 13, 0.92));
+          border: 1px solid rgba(255, 255, 255, 0.1);
           border-left: 2px solid transparent;
-          transition: border-color 0.2s;
+          border-radius: 22px;
+          backdrop-filter: blur(10px);
+          transition: border-color 0.2s, transform 0.2s, background 0.2s;
         }
 
         .sdk-feature:hover {
-          border-left-color: var(--color-accent);
+          border-left-color: var(--keiros-accent);
+          transform: translateY(-2px);
+          background: linear-gradient(180deg, rgba(10, 18, 24, 0.94), rgba(6, 10, 14, 0.98));
         }
 
         .sdk-check {
           min-width: 20px;
           margin-top: 2px;
-          color: var(--color-accent);
+          color: var(--keiros-accent);
         }
 
         .sdk-feature div {
@@ -1027,16 +1331,24 @@ export default function HomeSections() {
         .code-block {
           position: relative;
           overflow: hidden;
-          border: 1px solid color-mix(in oklab, var(--color-foreground) 10%, transparent);
+          border: 1px solid color-mix(in oklab, var(--keiros-accent) 18%, rgba(255, 255, 255, 0.1));
           border-radius: 26px;
-          background: #0f1117;
+          background: linear-gradient(180deg, rgba(10, 15, 21, 0.98), rgba(7, 10, 15, 1));
           box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.04),
-            0 20px 60px rgba(0, 0, 0, 0.25);
+            inset 0 1px 0 rgba(255, 255, 255, 0.05),
+            0 24px 80px rgba(0, 0, 0, 0.28);
           color: #d4d4d4;
           font-family: 'DM Mono', monospace;
           font-size: 0.85rem;
           line-height: 1.9;
+        }
+
+        .code-block::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          background: radial-gradient(circle at top left, color-mix(in oklab, var(--keiros-accent) 12%, transparent), transparent 34%);
         }
 
         .code-toolbar {
@@ -1046,7 +1358,7 @@ export default function HomeSections() {
           gap: 16px;
           padding: 14px 18px;
           border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-          background: #151925;
+          background: rgba(18, 24, 34, 0.92);
         }
 
         .code-dots {
@@ -1147,13 +1459,13 @@ export default function HomeSections() {
         }
 
         .btn-primary {
-          background: var(--color-accent);
-          color: var(--color-accent-foreground);
+          background: var(--keiros-accent);
+          color: var(--keiros-accent-foreground);
           font-weight: 600;
         }
 
         .btn-primary:hover {
-          background: color-mix(in oklab, var(--color-accent) 88%, white);
+          background: color-mix(in oklab, var(--keiros-accent) 88%, white);
           transform: translateY(-2px);
         }
 
@@ -1200,12 +1512,12 @@ export default function HomeSections() {
         }
 
         .pricing-card.featured {
-          background: var(--color-accent);
-          color: var(--color-accent-foreground);
+          background: var(--keiros-accent);
+          color: var(--keiros-accent-foreground);
         }
 
         .pricing-card.featured * {
-          color: var(--color-accent-foreground);
+          color: var(--keiros-accent-foreground);
         }
 
         .plan-tag {
@@ -1234,7 +1546,7 @@ export default function HomeSections() {
 
         .plan-price {
           margin-bottom: 4px;
-          color: var(--color-accent);
+          color: var(--keiros-accent);
           font-family: 'Bebas Neue', sans-serif;
           font-size: 3.5rem;
           line-height: 1;
@@ -1269,11 +1581,11 @@ export default function HomeSections() {
           content: '->';
           position: absolute;
           left: 0;
-          color: var(--color-accent);
+          color: var(--keiros-accent);
         }
 
         .pricing-card.featured .feature-item::before {
-          color: var(--color-accent-foreground);
+          color: var(--keiros-accent-foreground);
         }
 
         .device-note {
@@ -1283,7 +1595,36 @@ export default function HomeSections() {
         }
 
         .contact-section {
+          position: relative;
+          overflow: hidden;
           text-align: center;
+          background: linear-gradient(135deg, #0d1117 0%, #080a0c 100%);
+        }
+
+        .contact-section::before {
+          content: 'KEIROS';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 100%;
+          text-align: center;
+          color: color-mix(in oklab, var(--keiros-accent) 6%, transparent);
+          font-family: 'Bebas Neue', sans-serif;
+          font-size: min(24vw, 18rem);
+          letter-spacing: 0.05em;
+          line-height: 1;
+          white-space: nowrap;
+          pointer-events: none;
+        }
+
+        .contact-inner {
+          position: relative;
+          z-index: 1;
+          max-width: 800px;
+          margin: 0 auto;
+          padding-left: 48px;
+          padding-right: 48px;
         }
 
         .contact-sub {
@@ -1323,7 +1664,7 @@ export default function HomeSections() {
         }
 
         .form-input:focus {
-          border-color: var(--color-accent);
+          border-color: var(--keiros-accent);
         }
 
         .form-submit {
@@ -1331,8 +1672,8 @@ export default function HomeSections() {
           margin-top: 6px;
           padding: 16px 36px;
           border: none;
-          background: var(--color-accent);
-          color: var(--color-accent-foreground);
+          background: var(--keiros-accent);
+          color: var(--keiros-accent-foreground);
           font-family: 'DM Sans', sans-serif;
           font-size: 0.9rem;
           font-weight: 600;
@@ -1357,7 +1698,7 @@ export default function HomeSections() {
         }
 
         .contact-alts a:hover {
-          color: var(--color-accent);
+          color: var(--keiros-accent);
         }
 
         @keyframes blink {
@@ -1380,6 +1721,11 @@ export default function HomeSections() {
             padding-right: 24px;
           }
 
+          .contact-inner {
+            padding-left: 24px;
+            padding-right: 24px;
+          }
+
           .solution-layout,
           .dev-layout,
           .pricing-grid {
@@ -1397,6 +1743,16 @@ export default function HomeSections() {
             transform: none;
           }
 
+          .howitworks-section {
+            min-height: auto;
+          }
+
+          .howitworks-section .section-inner {
+            position: static;
+            min-height: auto;
+            display: block;
+          }
+
           .howitworks-section .section-headline,
           .step {
             opacity: 1;
@@ -1407,16 +1763,53 @@ export default function HomeSections() {
             transform: scaleX(1);
           }
 
+          .steps-viewport {
+            overflow: visible;
+            min-height: auto;
+            width: 100%;
+            margin-left: 0;
+            margin-right: 0;
+          }
+
+          .steps-track {
+            display: grid;
+            gap: 16px;
+            padding-left: 0;
+            padding-right: 0;
+            transform: none !important;
+          }
+
+          .step {
+            position: relative;
+            flex: initial;
+            width: 100%;
+            min-height: auto;
+            padding: 40px 32px;
+            margin-bottom: 16px;
+            opacity: 1;
+            transform: none;
+            z-index: auto;
+          }
+
+          .step h3 {
+            max-width: 100%;
+          }
+
+          .step-num {
+            top: 72px;
+            right: 24px;
+          }
+
+          .steps-dots {
+            display: none;
+          }
+
           .problem-cards {
             grid-template-columns: 1fr;
           }
         }
 
         @media (max-width: 768px) {
-          .steps {
-            grid-template-columns: 1fr 1fr;
-          }
-
           .form-row {
             grid-template-columns: 1fr;
           }
@@ -1443,12 +1836,13 @@ export default function HomeSections() {
             padding-right: 20px;
           }
 
-          .section-headline {
-            font-size: 48px;
+          .contact-inner {
+            padding-left: 20px;
+            padding-right: 20px;
           }
 
-          .steps {
-            grid-template-columns: 1fr;
+          .section-headline {
+            font-size: clamp(2.9rem, 12vw, 4rem);
           }
 
           .contact-alts {
