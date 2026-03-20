@@ -20,22 +20,25 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
-            <Link href="/" className="text-foreground/80 hover:text-foreground text-sm transition">
-              HOME
+            <Link href="#problem" className="text-foreground/80 hover:text-foreground text-sm transition">
+              PROBLEM
             </Link>
-            <Link href="/device" className="text-foreground/80 hover:text-foreground text-sm transition">
-              DEVICE
+            <Link href="#solution" className="text-foreground/80 hover:text-foreground text-sm transition">
+              SOLUTION
             </Link>
-            <Link href="/contact" className="text-foreground/80 hover:text-foreground text-sm transition">
-              CONTACT
+            <Link href="#developers" className="text-foreground/80 hover:text-foreground text-sm transition">
+              DEVELOPERS
+            </Link>
+            <Link href="#pricing" className="text-foreground/80 hover:text-foreground text-sm transition">
+              PRICING
             </Link>
           </nav>
 
           {/* CTA Button */}
           <div className="hidden md:block">
-            <button className="px-6 py-2 bg-accent text-accent-foreground rounded-full text-sm font-medium hover:opacity-90 transition">
+            <Link href="#contact" className="px-6 py-2 bg-accent text-accent-foreground rounded-full text-sm font-medium hover:opacity-90 transition inline-flex">
               Get Started
-            </button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -50,18 +53,21 @@ export default function Header() {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden pb-4 space-y-2">
-            <Link href="/" className="block text-foreground/80 hover:text-foreground text-sm py-2" onClick={() => setMobileMenuOpen(false)}>
-              HOME
+            <Link href="#problem" className="block text-foreground/80 hover:text-foreground text-sm py-2" onClick={() => setMobileMenuOpen(false)}>
+              PROBLEM
             </Link>
-            <Link href="/device" className="block text-foreground/80 hover:text-foreground text-sm py-2" onClick={() => setMobileMenuOpen(false)}>
-              DEVICE
+            <Link href="#solution" className="block text-foreground/80 hover:text-foreground text-sm py-2" onClick={() => setMobileMenuOpen(false)}>
+              SOLUTION
             </Link>
-            <Link href="/contact" className="block text-foreground/80 hover:text-foreground text-sm py-2" onClick={() => setMobileMenuOpen(false)}>
-              CONTACT
+            <Link href="#developers" className="block text-foreground/80 hover:text-foreground text-sm py-2" onClick={() => setMobileMenuOpen(false)}>
+              DEVELOPERS
             </Link>
-            <button className="w-full px-6 py-2 bg-accent text-accent-foreground rounded-full text-sm font-medium mt-4">
+            <Link href="#pricing" className="block text-foreground/80 hover:text-foreground text-sm py-2" onClick={() => setMobileMenuOpen(false)}>
+              PRICING
+            </Link>
+            <Link href="#contact" className="w-full px-6 py-2 bg-accent text-accent-foreground rounded-full text-sm font-medium mt-4 inline-flex justify-center" onClick={() => setMobileMenuOpen(false)}>
               Get Started
-            </button>
+            </Link>
           </div>
         )}
       </div>
