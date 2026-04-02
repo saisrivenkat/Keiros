@@ -50,9 +50,17 @@ const KeirosLogo = () => {
       const direction = Math.sign(event.deltaY);
       if (direction === 0) return;
 
-      const canAdvance = direction > 0 && targetStepRef.current < 5;
+      const isAnimating = Math.abs(currentStepRef.current - targetStepRef.current) > 0.01;
+      const canAdvance = direction > 0 && targetStepRef.current < 4;
       const canRewind = direction < 0 && targetStepRef.current > 0;
 
+      // Block scroll while animation is still settling
+      if (isAnimating) {
+        event.preventDefault();
+        return;
+      }
+
+      // At the end (step 4 fully settled) and scrolling down — let page scroll
       if (!canAdvance && !canRewind) {
         return;
       }
@@ -71,7 +79,7 @@ const KeirosLogo = () => {
       const next = current + (target - current) * 0.11;
 
       currentStepRef.current = next;
-      setProgress(next / 5);
+      setProgress(next / 4);
       rafRef.current = requestAnimationFrame(animate);
     };
 
@@ -91,25 +99,23 @@ const KeirosLogo = () => {
   }, []);
 
   const easeInOut = (value: number) => 0.5 - 0.5 * Math.cos(Math.PI * value);
-  const exactStep = progress * 5;
+  const exactStep = progress * 4;
   const stageOne = easeInOut(Math.min(exactStep, 1));
   const stageTwo = easeInOut(Math.min(Math.max(exactStep - 1, 0), 1));
   const stageThree = easeInOut(Math.min(Math.max(exactStep - 2, 0), 1));
   const stageFour = easeInOut(Math.min(Math.max(exactStep - 3, 0), 1));
-  const stageFive = easeInOut(Math.min(Math.max(exactStep - 4, 0), 1));
 
-  const rotateDeg = (stageOne + stageTwo + stageThree + stageFour + stageFive) * 360;
+  const rotateDeg = (stageOne + stageTwo + stageThree + stageFour) * 90;
   const scale =
     1.04 +
-    stageOne * 0.68 +
-    stageTwo * 0.52 +
-    stageThree * 0.76 +
-    stageFour * 0.96;
-  const translateY = -(stageOne * 14 + stageTwo * 20 + stageThree * 28 + stageFour * 12);
-  const logoOpacity = stageFour < 0.42 ? 1 : Math.max(0, 1 - (stageFour - 0.42) / 0.58);
-  const handoffClip = Math.max(0, 140 - (stageFour * 120 + stageFive * 20));
-  const heroReveal = Math.min(140, stageFour * 88 + stageFive * 52);
-  const hideLogo = stageFour > 0.94;
+    stageOne * 0.5 +
+    stageTwo * 0.7 +
+    stageThree * 0.9 +
+    stageFour * 1.2;
+  const translateY = -(stageOne * 10 + stageTwo * 14 + stageThree * 18 + stageFour * 8);
+  const logoOpacity = Math.max(0, 1 - stageFour);
+  const hideLogo = stageFour > 0.95;
+  const heroReveal = hideLogo ? 140 : 0;
 
   return (
     <section ref={sectionRef} className="relative h-screen bg-black">
@@ -130,8 +136,8 @@ const KeirosLogo = () => {
             transform: `translateY(${translateY}px) rotate(${rotateDeg}deg) scale(${viewportScale * scale})`,
             transformOrigin: "50% 50%",
             opacity: logoOpacity,
-            clipPath: `circle(${handoffClip}% at 50% 50%)`,
-            WebkitClipPath: `circle(${handoffClip}% at 50% 50%)`,
+            clipPath: hideLogo ? `circle(0% at 50% 50%)` : `circle(140% at 50% 50%)`,
+            WebkitClipPath: hideLogo ? `circle(0% at 50% 50%)` : `circle(140% at 50% 50%)`,
             filter: `blur(${stageFour * 2.4}px)`,
             visibility: hideLogo ? "hidden" : "visible",
             pointerEvents: hideLogo ? "none" : "auto",

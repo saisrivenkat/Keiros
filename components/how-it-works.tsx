@@ -63,8 +63,8 @@ export default function HowItWorks() {
                 <p className="max-w-[280px] text-sm leading-relaxed text-white/75">{step.description}</p>
               </div>
 
-              <div className="relative overflow-hidden rounded-[999px] border border-transparent bg-transparent md:border-white/10 md:bg-black/30">
-                <div className="relative h-[150px] sm:h-[200px] lg:h-[190px]">
+              <div className="relative overflow-hidden rounded-3xl border border-transparent bg-transparent md:border-white/10 md:bg-black/30">
+                <div className="relative h-[180px] sm:h-[240px] lg:h-[230px]">
                   <Image
                     src={step.image}
                     alt={step.alt}
