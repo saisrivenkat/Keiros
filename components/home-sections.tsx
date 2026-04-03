@@ -190,6 +190,7 @@ export default function HomeSections() {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           if (vid.paused) {
+            vid.currentTime = 0;
             const playPromise = vid.play();
             if (playPromise && typeof playPromise.catch === "function") {
               playPromise.catch(() => {});
@@ -342,7 +343,7 @@ export default function HomeSections() {
   const imgRotateX = 4 - p * 4;
   const imgTranslateY = 50 - p * 68;
   const imgInnerZoom = 1.28 - p * 0.24;
-  const imgBrightness = 0.3 + p * 0.7;
+  const imgBrightness = 1;
   const glowOpacity = p * 0.36;
   const overlayActive = Math.min(Math.max((p - 0.08) / 0.3, 0), 1);
   const scanLineY = 12 + 76 * overlayActive;
@@ -376,26 +377,15 @@ export default function HomeSections() {
             }}
           >
             <div className="problem-image-frame">
-              <span
-                className="problem-image-glow"
-                style={{ opacity: glowOpacity }}
-                aria-hidden="true"
-              />
-              <span
-                className="problem-image-scan"
-                style={{ transform: `translateY(${scanLineY}%)`, opacity: overlayActive }}
-                aria-hidden="true"
-              />
-              <span className="problem-image-grid" aria-hidden="true" />
               <Image
                 src="/building.jpeg"
                 alt="Modern multi-unit building exterior"
                 fill
                 sizes="(max-width: 1024px) 100vw, 40vw"
                 className="problem-image"
+                quality={90}
                 style={{
                   transform: `scale(${imgInnerZoom})`,
-                  filter: `brightness(${imgBrightness})`,
                 }}
               />
             </div>
@@ -420,25 +410,8 @@ export default function HomeSections() {
             <h2
               className="section-headline problem-headline"
             >
-              <span className="typewriter-live" aria-live="polite">
-                <span className="typewriter-text">
-                  {HEADLINE_TEXT.slice(0, typedCount).slice(
-                    0,
-                    Math.max(0, HEADLINE_TEXT.indexOf("exact")),
-                  )}
-                  <span className="typewriter-accent">
-                    {HEADLINE_TEXT.slice(
-                      Math.max(0, HEADLINE_TEXT.indexOf("exact")),
-                      Math.min(typedCount, HEADLINE_TEXT.length),
-                    )}
-                  </span>
-                </span>
-                {caretVisible && (
-                  <span className="caret" aria-hidden="true">
-                    |
-                  </span>
-                )}
-              </span>
+              TRADITIONAL ADDRESSES OFTEN MISS{" "}
+              <em>EXACT LOCATIONS.</em>
             </h2>
 
             <div
@@ -487,7 +460,6 @@ export default function HomeSections() {
               ref={videoRef}
               className="hero-video"
               src="/video.mp4"
-              autoPlay
               muted
               loop
               playsInline
@@ -499,12 +471,6 @@ export default function HomeSections() {
               <span className="hud-dot" />
               <span className="hud-pill">±3 ft + elevation</span>
             </div>
-          </div>
-          <div className="video-overlay">
-            <div className="video-tag">Keiros Demo</div>
-            <p className="video-caption">
-              See how precise, floor-aware guidance feels in motion.
-            </p>
           </div>
         </div>
       </section>

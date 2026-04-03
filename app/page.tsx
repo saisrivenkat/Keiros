@@ -2,6 +2,7 @@ import Header from '@/components/header'
 import KeirosLogo from '@/components/KeirosLogo'
 import MediaSection from '@/components/MediaSection'
 import HomeSections from '@/components/home-sections'
+import UseCases from '@/components/use-cases'
 import Footer from '@/components/footer'
 
 export default function Home() {
@@ -11,6 +12,7 @@ export default function Home() {
       <KeirosLogo />
       {/* <MediaSection /> */}
       <HomeSections />
+      <UseCases />
       <Footer />
     </main>
   )

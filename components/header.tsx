@@ -21,12 +21,15 @@ export default function Header() {
           {/* Navigation + CTA */}
           <div className="hidden md:flex items-center gap-8">
             <Link href="#problem" className="text-foreground/80 hover:text-foreground text-sm transition">
-              PROBLEM
+              THE PROBLEM
             </Link>
             <Link href="#solution" className="text-foreground/80 hover:text-foreground text-sm transition">
               SOLUTION
             </Link>
-            
+            <Link href="#usecases" className="text-foreground/80 hover:text-foreground text-sm transition">
+              USE CASES
+            </Link>
+
             <Link href="#contact" className="px-6 py-2 bg-accent text-accent-foreground rounded-full text-sm font-medium hover:opacity-90 transition inline-flex">
               Get Early Access
             </Link>
@@ -51,10 +54,13 @@ export default function Header() {
               </span>
             </div>
             <Link href="#problem" className="block text-foreground/80 hover:text-foreground text-sm py-2" onClick={() => setMobileMenuOpen(false)}>
-              PROBLEM
+              THE PROBLEM
             </Link>
             <Link href="#solution" className="block text-foreground/80 hover:text-foreground text-sm py-2" onClick={() => setMobileMenuOpen(false)}>
               SOLUTION
+            </Link>
+            <Link href="#usecases" className="block text-foreground/80 hover:text-foreground text-sm py-2" onClick={() => setMobileMenuOpen(false)}>
+              USE CASES
             </Link>
             <Link href="#developers" className="block text-foreground/80 hover:text-foreground text-sm py-2" onClick={() => setMobileMenuOpen(false)}>
               DEVELOPERS
