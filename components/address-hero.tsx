@@ -3,6 +3,14 @@
 import Link from 'next/link'
 
 export default function AddressHero() {
+  const heroCtaStyle = {
+    backgroundColor: 'var(--accent)',
+    color: 'var(--accent-foreground)',
+    borderColor: 'transparent',
+    padding:'10px',
+    borderRadius: '10px',
+  } as const
+
   return (
     <section id="hero" className="index-hero">
       <div className="hero-wrap">
@@ -21,11 +29,11 @@ export default function AddressHero() {
             stop getting lost in the last hundred meters.
           </p>
           <div className="hero-actions">
-            <Link href="#contact" className="btn-primary">
+            <Link href="#contact" className="hero-cta" style={heroCtaStyle}>
               Request Early Access
             </Link>
-            <Link href="#solution" className="btn-secondary">
-              See How It Works
+            <Link href="#solution" className="hero-cta" style={heroCtaStyle}>
+              How It Works
             </Link>
           </div>
         </div>
@@ -45,14 +53,35 @@ export default function AddressHero() {
 
       <div className="hero-stat-strip">
         {[
-          ['3 FT', 'Location accuracy including elevation'],
-          ['$0', 'Hardware cost on the subscription model'],
-          ['ANY', 'Building, campus, or multi-unit property'],
-          ['SDK', 'Embed directly into your product'],
-        ].map(([value, label]) => (
-          <div key={label} className="hero-stat">
-            <div className="stat-num">{value}</div>
-            <div className="stat-label">{label}</div>
+          {
+            label: 'Location accuracy including elevation',
+            kind: 'accuracy',
+            symbol: '+/-',
+            value: '3',
+            unit: 'FT',
+          },
+          {
+            label: 'Building, campus, or multi-unit property',
+            kind: 'default',
+            value: 'ANY',
+          },
+          {
+            label: 'Embed directly into your product',
+            kind: 'default',
+            value: 'SDK',
+          },
+        ].map((stat) => (
+          <div key={stat.label} className="hero-stat">
+            {stat.kind === 'accuracy' ? (
+              <div className="stat-accuracy" aria-label="Plus or minus 3 feet">
+                <span className="stat-accuracy__symbol">{stat.symbol}</span>
+                <span className="stat-accuracy__value">{stat.value}</span>
+                <span className="stat-accuracy__unit">{stat.unit}</span>
+              </div>
+            ) : (
+              <div className="stat-num">{stat.value}</div>
+            )}
+            <div className="stat-label">{stat.label}</div>
           </div>
         ))}
       </div>
@@ -123,9 +152,9 @@ export default function AddressHero() {
           max-width: none;
           margin: 0 0 32px;
           color: rgba(244, 242, 238, 0.7);
-          font-size: 1rem;
+          font-size: 1.18rem;
           font-weight: 300;
-          line-height: 1.6;
+          line-height: 1.65;
         }
 
         .hero-actions {
@@ -135,36 +164,34 @@ export default function AddressHero() {
           align-items: center;
         }
 
-        .btn-primary,
-        .btn-secondary {
-          display: inline-block;
-          padding: 16px 36px;
+        .hero-cta {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 56px;
+          padding: 16px 30px;
+          background: var(--accent);
+          color: var(--accent-foreground);
+          border: 1px solid transparent;
+          border-radius: 9999px;
+          font-weight: 600;
           font-size: 0.9rem;
           letter-spacing: 0.06em;
+          line-height: 1;
+          box-shadow:
+            0 12px 30px rgba(0, 0, 0, 0.18),
+            inset 0 1px 0 rgba(255, 255, 255, 0.12);
           text-decoration: none;
           text-transform: uppercase;
-          transition: background 0.2s, border-color 0.2s, transform 0.2s;
+          transition: background 0.2s, transform 0.2s, box-shadow 0.2s, opacity 0.2s;
         }
 
-        .btn-primary {
-          background: var(--keiros-accent);
-          color: var(--keiros-accent-foreground);
-          font-weight: 600;
-        }
-
-        .btn-primary:hover {
-          background: color-mix(in oklab, var(--keiros-accent) 88%, white);
+        .hero-cta:hover {
+          background: color-mix(in oklab, var(--accent) 88%, white);
           transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-          border: 1px solid rgba(244, 242, 238, 0.3);
-          color: var(--color-foreground);
-        }
-
-        .btn-secondary:hover {
-          border-color: var(--color-foreground);
-          transform: translateY(-2px);
+          box-shadow:
+            0 18px 36px rgba(0, 0, 0, 0.24),
+            inset 0 1px 0 rgba(255, 255, 255, 0.18);
         }
 
         .hero-visual {
@@ -287,6 +314,36 @@ export default function AddressHero() {
           line-height: 1;
         }
 
+        .stat-accuracy {
+          display: inline-flex;
+          align-items: baseline;
+          gap: 8px;
+          margin-bottom: 6px;
+          padding: 0;
+          color: var(--keiros-accent);
+          line-height: 1;
+        }
+
+        .stat-accuracy__symbol {
+          font-family: 'DM Mono', monospace;
+          font-size: 0.84rem;
+          letter-spacing: 0.08em;
+          opacity: 0.88;
+        }
+
+        .stat-accuracy__value {
+          font-family: 'Bebas Neue', sans-serif;
+          font-size: 2.2rem;
+          letter-spacing: 0.05em;
+        }
+
+        .stat-accuracy__unit {
+          color: rgba(244, 242, 238, 0.82);
+          font-family: 'DM Mono', monospace;
+          font-size: 0.8rem;
+          letter-spacing: 0.14em;
+        }
+
         .stat-label {
           color: var(--color-muted-foreground);
           font-family: 'DM Mono', monospace;
@@ -370,6 +427,15 @@ export default function AddressHero() {
 
           .hero-sub {
             font-size: 0.95rem;
+          }
+
+          .hero-actions {
+            gap: 14px;
+          }
+
+          .hero-cta {
+            width: 100%;
+            padding: 15px 22px;
           }
 
           .hero-stat {
