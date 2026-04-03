@@ -7,7 +7,7 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'KEIROS - Manage Your Experience',
+  title: 'Keiros — Precision Location. Every Address. Every Floor.',
   description: 'Create, engage, and analyze your brand experience with KEIROS',
   openGraph: {
     title: 'Keiros — Precision Location. Every Address. Every Floor.',
