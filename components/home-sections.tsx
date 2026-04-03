@@ -515,8 +515,8 @@ export default function HomeSections() {
                     {index === 3 ? <span className="floor-pin" /> : null}
             </div>
                 ))}
+                <div className="accuracy-callout">+/- 3 FT + ELEVATION</div>
               </div>
-              <div className="accuracy-callout">+/- 3 FT + ELEVATION</div>
           </div>
 
             <div className="solution-points">
@@ -1622,9 +1622,12 @@ export default function HomeSections() {
 
         .accuracy-callout {
           position: absolute;
-          top: 52%;
-          right: 7px;
-          padding: 10px 16px;
+          bottom: 120px;
+          left: calc(100% + 12px);
+          height: 60px;
+          display: flex;
+          align-items: center;
+          padding: 0 14px;
           white-space: nowrap;
           background: var(--keiros-accent);
           color: var(--keiros-accent-foreground);
@@ -2670,10 +2673,9 @@ export default function HomeSections() {
           }
 
           .accuracy-callout {
-            right: 61px;
-            top: 53%;
-            font-size: 0.6rem;
-            padding: 8px 12px;
+            font-size: 0.55rem;
+            padding: 0 10px;
+            left: calc(100% + 8px);
           }
         }
 
