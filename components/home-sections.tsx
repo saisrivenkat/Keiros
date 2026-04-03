@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import UseCases from "./use-cases";
 import {
   Building2,
   Check,
@@ -381,12 +382,12 @@ export default function HomeSections() {
                 src="/building.jpeg"
                 alt="Modern multi-unit building exterior"
                 fill
-                sizes="(max-width: 1024px) 100vw, 40vw"
-                className="problem-image"
+                // sizes="(max-width: 1024px) 100vw, 40vw"
+                //className="problem-image"
                 quality={90}
-                style={{
-                  transform: `scale(${imgInnerZoom})`,
-                }}
+                // style={{
+                //   transform: `scale(${imgInnerZoom})`,
+                // }}
               />
             </div>
           </div>
@@ -538,10 +539,7 @@ export default function HomeSections() {
         </div>
       </section>
 
-      {/*
-        Remaining extra section hidden for now:
-        Use Cases
-      */}
+      <UseCases />
 
       <section
         id="howitworks"
