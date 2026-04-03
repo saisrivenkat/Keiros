@@ -47,12 +47,7 @@ export default function Header() {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden pb-4 space-y-2">
-            <div className="flex items-center gap-3 px-2">
-              <Image src="/keiros-logo.png" alt="Keiros" width={100} height={20} />
-              <span className="text-[11px] text-foreground/70 tracking-[0.08em]">
-                Precision Location. Every Address. Every Floor.
-              </span>
-            </div>
+           
             <Link href="#problem" className="block text-foreground/80 hover:text-foreground text-sm py-2" onClick={() => setMobileMenuOpen(false)}>
               THE PROBLEM
             </Link>
@@ -62,11 +57,8 @@ export default function Header() {
             <Link href="#usecases" className="block text-foreground/80 hover:text-foreground text-sm py-2" onClick={() => setMobileMenuOpen(false)}>
               USE CASES
             </Link>
-            <Link href="#developers" className="block text-foreground/80 hover:text-foreground text-sm py-2" onClick={() => setMobileMenuOpen(false)}>
-              DEVELOPERS
-            </Link>
             <Link href="#contact" className="w-full px-6 py-2 bg-accent text-accent-foreground rounded-full text-sm font-medium mt-4 inline-flex justify-center" onClick={() => setMobileMenuOpen(false)}>
-              Get Started
+              Get Early Access
             </Link>
           </div>
         )}
