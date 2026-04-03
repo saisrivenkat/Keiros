@@ -117,37 +117,7 @@ const KeirosLogo = () => {
   const hideLogo = stageFour > 0.95;
   const heroReveal = hideLogo ? 140 : 0;
 
-  return (
-    <section ref={sectionRef} className="relative h-screen bg-black">
-      <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center">
-        <div
-          className="absolute inset-0 z-0"
-          style={{
-            clipPath: `circle(${heroReveal}% at 50% 50%)`,
-            WebkitClipPath: `circle(${heroReveal}% at 50% 50%)`,
-          }}
-        >
-          <AddressHero />
-        </div>
-
-        <div
-          className="will-change-transform relative z-10"
-          style={{
-            transform: `translateY(${translateY}px) rotate(${rotateDeg}deg) scale(${viewportScale * scale})`,
-            transformOrigin: "50% 50%",
-            opacity: logoOpacity,
-            clipPath: hideLogo ? `circle(0% at 50% 50%)` : `circle(140% at 50% 50%)`,
-            WebkitClipPath: hideLogo ? `circle(0% at 50% 50%)` : `circle(140% at 50% 50%)`,
-            filter: `blur(${stageFour * 2.4}px)`,
-            visibility: hideLogo ? "hidden" : "visible",
-            pointerEvents: hideLogo ? "none" : "auto",
-          }}
-        >
-          <div dangerouslySetInnerHTML={{ __html: markup }} />
-        </div>
-      </div>
-    </section>
-  );
+  return <AddressHero />;
 };
 
 export default KeirosLogo;

@@ -1,5 +1,4 @@
 import Image from 'next/image'
-import { Facebook, Instagram, Youtube } from 'lucide-react'
 
 export default function Footer() {
   return (
@@ -10,19 +9,13 @@ export default function Footer() {
             <div>
               <h3 className="text-3xl font-semibold text-white">Keiros</h3>
               <p className="mt-3 text-base text-white/90">To the point</p>
-              <p className="mt-1 text-base text-[#5BC9F0]">Coming Soon</p>
 
-              <h4 className="mt-8 text-3xl font-semibold text-white">App</h4>
-              <ul className="mt-3 space-y-1 text-base text-white/90">
-                <li>FAQs</li>
-                <li>About keiros</li>
-              </ul>
+              
             </div>
 
             <div>
-              <h3 className="text-3xl font-semibold text-white">Contact</h3>
-              <p className="mt-3 text-base text-white/90">Email: help@keiros.com</p>
-              <p className="mt-1 text-base text-white/90">Location: New York, NY</p>
+              <h3 className="text-3xl font-semibold text-white mb-3">Contact</h3>
+              <p className="mt-1 text-base text-white/90">Email: <a href="mailto:sales@keiros.ai" className="text-[#5BC9F0] hover:underline">sales@keiros.ai</a></p>
             </div>
           </div>
 
@@ -40,22 +33,6 @@ export default function Footer() {
         </div>
 
         <div className="mt-14 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
-          <div className="flex items-center gap-7 text-white">
-            <a href="#" aria-label="Instagram" className="opacity-90 transition hover:opacity-100">
-              <Instagram size={22} />
-            </a>
-            <a href="#" aria-label="Twitter/X" className="text-xl font-semibold opacity-90 transition hover:opacity-100">
-              X
-            </a>
-            <a href="#" aria-label="Facebook" className="opacity-90 transition hover:opacity-100">
-              <Facebook size={22} />
-            </a>
-            <a href="#" aria-label="YouTube" className="opacity-90 transition hover:opacity-100">
-              <Youtube size={22} />
-            </a>
-           
-          </div>
-
           <p className="text-sm text-white/70">© Keiros, all rights reserved.</p>
         </div>
       </div>

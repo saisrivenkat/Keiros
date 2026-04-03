@@ -1,250 +1,477 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { Building2, Check, Code2, MapPin, Package, ShieldAlert, Waypoints } from 'lucide-react'
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import Image from "next/image";
+import Link from "next/link";
+import {
+  Building2,
+  Check,
+  Code2,
+  MapPin,
+  Package,
+  ShieldAlert,
+  Waypoints,
+} from "lucide-react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 
 const problemCards = [
   {
-    title: 'Emergency Response Delays',
+    title: "Emergency Response Delays",
     description:
-      "First responders lose critical minutes navigating buildings without precise location data. When seconds count, a street address isn't enough.",
+      "First responders lose critical minutes navigating buildings without precise location data. When seconds count, inaccurate locations turn into critical loss of life.",
     icon: ShieldAlert,
     urgent: true,
   },
   {
-    title: 'Failed & Misrouted Deliveries',
+    title: "Failed & Misrouted Deliveries",
     description:
-      'Lost productivity and re-delivery costs keep stacking up because the last 100 meters still have no infrastructure.',
+      "Lost productivity and re-delivery costs keep stacking up because the last 100 meters still have no infrastructure.",
     icon: Package,
   },
   {
-    title: 'Complex Premises Are Invisible',
+    title: "Complex Premises Are Invisible",
     description:
       "Apartments, warehouses, office parks, and campuses still don't exist with internal precision in today's mapping systems.",
     icon: Building2,
   },
-]
+];
 
 const solutionPoints = [
   {
-    title: 'Place the Device',
+    title: "Place the Device",
     description:
-      'Install a Keiros device at your property to map exact physical position, floor, and elevation against the address instantly.',
+      "Install a Keiros device at your property to map exact physical position, floor, and elevation against the address instantly.",
   },
   {
-    title: 'Navigate with Precision',
+    title: "Navigate with Precision",
     description:
-      'Drivers, paramedics, visitors, and residents can navigate to the exact destination instead of stopping at the front gate.',
+      "Drivers, paramedics, visitors, and residents can navigate to the exact destination instead of stopping at the front gate.",
   },
   {
-    title: 'Works with Your Tools',
+    title: "Works with Your Tools",
     description:
-      'Keiros layers into existing maps and business software so teams keep their workflows while gaining address-level precision.',
+      "Keiros layers into existing maps and business software so teams keep their workflows while gaining address-level precision.",
   },
-]
+];
 
 const steps = [
   {
-    title: 'Receive Your Device',
+    title: "Receive Your Device",
     description:
       "Your Keiros device ships without upfront hardware cost and is designed to be live in minutes.",
     icon: Package,
   },
   {
-    title: 'Place & Register',
+    title: "Place & Register",
     description:
-      'The device maps exact coordinates and elevation, then links them directly to the physical address.',
+      "The device maps exact coordinates and elevation, then links them directly to the physical address.",
     icon: MapPin,
   },
   {
-    title: 'Navigate with the App',
+    title: "Navigate with the App",
     description:
-      'Users open Keiros, enter an address, and get guided to the exact destination with much less guesswork.',
+      "Users open Keiros, enter an address, and get guided to the exact destination with much less guesswork.",
     icon: Waypoints,
   },
-  {
-    title: 'Embed with the SDK',
-    description:
-      'Businesses can integrate precision location directly into dispatch, delivery, and logistics platforms.',
-    icon: Code2,
-  },
-]
+];
 
 const sdkFeatures = [
-  'Drop-in SDK for iOS, Android, and web',
-  'Real-time location resolution API',
-  'Elevation and floor data included',
-  'Works with your existing map provider',
-]
+  "Drop-in SDK for iOS, Android, and web",
+  "Real-time location resolution API",
+  "Elevation and floor data included",
+  "Works with your existing map provider",
+];
 
 const pricingPlans = [
   {
-    name: 'Starter',
-    price: '$49',
-    cycle: '/ month - up to 5 devices',
+    name: "Starter",
+    price: "$49",
+    cycle: "/ month - up to 5 devices",
     features: [
-      'Up to 5 devices included',
-      'Mobile app access',
-      '3-foot accuracy plus elevation',
-      'Standard support',
-      'Cloud-backed location registry',
+      "Up to 5 devices included",
+      "Mobile app access",
+      "3-foot accuracy plus elevation",
+      "Standard support",
+      "Cloud-backed location registry",
     ],
   },
   {
-    name: 'Professional',
-    price: '$199',
-    cycle: '/ month - up to 25 devices',
+    name: "Professional",
+    price: "$199",
+    cycle: "/ month - up to 25 devices",
     featured: true,
     features: [
-      'Up to 25 devices included',
-      'Full SDK access',
-      'Real-time location resolution API',
-      'Priority support and onboarding',
-      'Analytics dashboard',
-      'Multi-property management',
+      "Up to 25 devices included",
+      "Full SDK access",
+      "Real-time location resolution API",
+      "Priority support and onboarding",
+      "Analytics dashboard",
+      "Multi-property management",
     ],
   },
   {
-    name: 'Enterprise',
-    price: 'Custom',
-    cycle: 'tailored to your deployment',
+    name: "Enterprise",
+    price: "Custom",
+    cycle: "tailored to your deployment",
     features: [
-      'Unlimited devices',
-      'White-label SDK available',
-      'Dedicated account management',
-      'SLA-backed uptime',
-      'Custom integrations',
-      'Government and emergency packages',
+      "Unlimited devices",
+      "White-label SDK available",
+      "Dedicated account management",
+      "SLA-backed uptime",
+      "Custom integrations",
+      "Government and emergency packages",
     ],
   },
-]
+];
 
 function SectionHeading({
   tag,
   children,
 }: {
-  tag: string
-  children: ReactNode
+  tag: string;
+  children: ReactNode;
 }) {
   return (
     <>
       <div className="section-tag">{tag}</div>
       <h2 className="section-headline">{children}</h2>
     </>
-  )
+  );
 }
 
 export default function HomeSections() {
-  const howItWorksRef = useRef<HTMLElement | null>(null)
-  const [howItWorksProgress, setHowItWorksProgress] = useState(0)
-  const [desktopHowItWorks, setDesktopHowItWorks] = useState(false)
-  const howItWorksTargetRef = useRef(0)
-  const howItWorksCurrentRef = useRef(0)
-  const howItWorksRafRef = useRef<number | null>(null)
+  const problemIntroRef = useRef<HTMLDivElement | null>(null);
+  const howItWorksRef = useRef<HTMLElement | null>(null);
+  const [problemIntroProgress, setProblemIntroProgress] = useState(0);
+  const [howItWorksProgress, setHowItWorksProgress] = useState(0);
+  const [desktopHowItWorks, setDesktopHowItWorks] = useState(false);
+  const [typedCount, setTypedCount] = useState(0);
+  const [caretVisible, setCaretVisible] = useState(true);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const howItWorksTargetRef = useRef(0);
+  const howItWorksCurrentRef = useRef(0);
+  const howItWorksRafRef = useRef<number | null>(null);
+  const HEADLINE_TEXT = "Traditional addresses often miss exact locations.";
 
   useEffect(() => {
-    const points = document.querySelectorAll('.solution-point')
-    const howHeading = document.querySelector('.howitworks-section .section-headline')
+    const points = document.querySelectorAll(".solution-point");
+    const howHeading = document.querySelector(
+      ".howitworks-section .section-headline",
+    );
+    const problemCardsEls = document.querySelectorAll(".problem-card");
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add('visible')
+            entry.target.classList.add("visible");
           }
-        })
+        });
       },
-      { threshold: 0.3, rootMargin: '0px 0px -10% 0px' },
-    )
+      { threshold: 0.3, rootMargin: "0px 0px -10% 0px" },
+    );
 
-    points.forEach((point) => observer.observe(point))
-    if (howHeading) observer.observe(howHeading)
+    points.forEach((point) => observer.observe(point));
+    problemCardsEls.forEach((card) => observer.observe(card));
+    if (howHeading) observer.observe(howHeading);
 
-    return () => observer.disconnect()
-  }, [])
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const vid = videoRef.current;
+    if (!vid) return;
+
+    const handleVisibility = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          if (vid.paused) {
+            const playPromise = vid.play();
+            if (playPromise && typeof playPromise.catch === "function") {
+              playPromise.catch(() => {});
+            }
+          }
+        } else {
+          if (!vid.paused) vid.pause();
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(handleVisibility, {
+      threshold: 0.35,
+    });
+    observer.observe(vid);
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const updateDesktopHowItWorks = () => {
-      setDesktopHowItWorks(window.innerWidth > 1024)
-    }
+      setDesktopHowItWorks(window.innerWidth > 1024);
+    };
 
-    updateDesktopHowItWorks()
-    window.addEventListener('resize', updateDesktopHowItWorks)
+    updateDesktopHowItWorks();
+    window.addEventListener("resize", updateDesktopHowItWorks);
 
     return () => {
-      window.removeEventListener('resize', updateDesktopHowItWorks)
-    }
-  }, [])
+      window.removeEventListener("resize", updateDesktopHowItWorks);
+    };
+  }, []);
+
+  useEffect(() => {
+    let timer: number | null = null;
+    let doneTimeout: number | null = null;
+
+    const startTyping = () => {
+      if (timer) window.clearInterval(timer);
+      if (doneTimeout) window.clearTimeout(doneTimeout);
+      setTypedCount(0);
+      setCaretVisible(true);
+      timer = window.setInterval(() => {
+        setTypedCount((prev) => {
+          if (prev >= HEADLINE_TEXT.length) {
+            if (timer) window.clearInterval(timer);
+            timer = null;
+            doneTimeout = window.setTimeout(() => setCaretVisible(false), 600);
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, 90);
+    };
+
+    const refEl = problemIntroRef.current;
+    if (!refEl) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            startTyping();
+          }
+        });
+      },
+      { threshold: 0.35 },
+    );
+
+    observer.observe(refEl);
+
+    return () => {
+      if (timer) window.clearInterval(timer);
+      if (doneTimeout) window.clearTimeout(doneTimeout);
+      observer.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    const updateProblemIntroProgress = () => {
+      if (!problemIntroRef.current) return;
+
+      const rect = problemIntroRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const start = viewportHeight * 0.92;
+      const end = -rect.height * 0.2;
+      const total = start - end || 1;
+      const raw = (start - rect.top) / total;
+      const next = Math.min(Math.max(raw, 0), 1);
+
+      setProblemIntroProgress(next);
+    };
+
+    updateProblemIntroProgress();
+    window.addEventListener("scroll", updateProblemIntroProgress, {
+      passive: true,
+    });
+    window.addEventListener("resize", updateProblemIntroProgress);
+
+    return () => {
+      window.removeEventListener("scroll", updateProblemIntroProgress);
+      window.removeEventListener("resize", updateProblemIntroProgress);
+    };
+  }, []);
 
   useEffect(() => {
     const updateHowItWorksProgress = () => {
-      if (!howItWorksRef.current) return
+      if (!howItWorksRef.current) return;
 
-      const rect = howItWorksRef.current.getBoundingClientRect()
-      const viewportHeight = window.innerHeight
-      const totalScrollable = Math.max(rect.height - viewportHeight, 1)
-      const scrolled = Math.min(Math.max(-rect.top, 0), totalScrollable)
-      howItWorksTargetRef.current = scrolled / totalScrollable
-    }
+      const rect = howItWorksRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const totalScrollable = Math.max(rect.height - viewportHeight, 1);
+      const scrolled = Math.min(Math.max(-rect.top, 0), totalScrollable);
+      howItWorksTargetRef.current = scrolled / totalScrollable;
+    };
 
     const animateHowItWorks = () => {
-      const current = howItWorksCurrentRef.current
-      const target = howItWorksTargetRef.current
-      const next = current + (target - current) * 0.12
+      const current = howItWorksCurrentRef.current;
+      const target = howItWorksTargetRef.current;
+      const next = current + (target - current) * 0.12;
 
-      howItWorksCurrentRef.current = next
-      setHowItWorksProgress(next)
-      howItWorksRafRef.current = requestAnimationFrame(animateHowItWorks)
-    }
+      howItWorksCurrentRef.current = next;
+      setHowItWorksProgress(next);
+      howItWorksRafRef.current = requestAnimationFrame(animateHowItWorks);
+    };
 
-    updateHowItWorksProgress()
-    window.addEventListener('scroll', updateHowItWorksProgress, { passive: true })
-    window.addEventListener('resize', updateHowItWorksProgress)
-    howItWorksRafRef.current = requestAnimationFrame(animateHowItWorks)
+    updateHowItWorksProgress();
+    window.addEventListener("scroll", updateHowItWorksProgress, {
+      passive: true,
+    });
+    window.addEventListener("resize", updateHowItWorksProgress);
+    howItWorksRafRef.current = requestAnimationFrame(animateHowItWorks);
 
     return () => {
-      window.removeEventListener('scroll', updateHowItWorksProgress)
-      window.removeEventListener('resize', updateHowItWorksProgress)
-      if (howItWorksRafRef.current) cancelAnimationFrame(howItWorksRafRef.current)
-    }
-  }, [])
+      window.removeEventListener("scroll", updateHowItWorksProgress);
+      window.removeEventListener("resize", updateHowItWorksProgress);
+      if (howItWorksRafRef.current)
+        cancelAnimationFrame(howItWorksRafRef.current);
+    };
+  }, []);
 
-  const activeStepFloat = howItWorksProgress * (steps.length - 1)
-  const activeStepIndex = Math.round(activeStepFloat)
+  const activeStepFloat = howItWorksProgress * (steps.length - 1);
+  const activeStepIndex = Math.round(activeStepFloat);
+  /* ── Problem section cinematic animation values ── */
+  const p = problemIntroProgress;
+  const problemReveal = Math.min(p * 2.8, 1);
+
+  // Image: dramatic 3D perspective zoom-out + tilt correction
+  const imgScale = 1.12 - p * 0.14;
+  const imgRotateY = 7 - p * 7;
+  const imgRotateX = 4 - p * 4;
+  const imgTranslateY = 50 - p * 68;
+  const imgInnerZoom = 1.28 - p * 0.24;
+  const imgBrightness = 0.3 + p * 0.7;
+  const glowOpacity = p * 0.36;
+  const overlayActive = Math.min(Math.max((p - 0.08) / 0.3, 0), 1);
+  const scanLineY = 12 + 76 * overlayActive;
+
+  // Text: staggered reveals
+  const tagSlide = -30 + Math.min(p * 52, 12 + 30);
+  const tagOpacity = Math.min(Math.max((p - 0.06) / 0.2, 0), 1);
+  const headlineReveal = Math.min(Math.max((p - 0.1) / 0.4, 0), 1);
+  const stmt1 = Math.min(Math.max((p - 0.25) / 0.3, 0), 1);
+  const stmt2 = Math.min(Math.max((p - 0.35) / 0.3, 0), 1);
+  const stmt3 = Math.min(Math.max((p - 0.45) / 0.3, 0), 1);
+  const copyTranslateY = 44 - p * 60;
 
   return (
     <>
-      <section className="index-banner-section">
+      {/* <section className="index-banner-section">
         <div className="banner-inner">
           <div className="banner-frame">
             <img src="/banner-hero.png" alt="Keiros banner" className="banner-image" />
           </div>
         </div>
-      </section>
+      </section> */}
 
       <section id="problem" className="index-section problem-section">
-        <div className="section-tag">The Problem</div>
-  <h2 className="section-headline">YOUR ADDRESS<br/>STOPS AT THE <em>FRONT DOOR.</em></h2>
-
-        <div className="problem-grid">
-          <div className="problem-statement">
-            <p>
-              Traditional addresses point to a building. <strong>Not a unit. Not a floor. Not a corridor.</strong>
-            </p>
-            <p>
-              In dense apartment complexes, hospitals, office campuses, and logistics hubs,
-              the final stretch is still left to guesswork.
-            </p>
-            <p>
-              For a delivery driver, that means wasted time. For an ambulance crew,
-              <strong> it can cost lives.</strong>
-            </p>
+        <div ref={problemIntroRef} className="problem-intro">
+          <div
+            className="problem-image-wrap"
+            style={{
+              opacity: problemReveal,
+              transform: `perspective(1400px) translate3d(0, ${imgTranslateY}px, 0) rotateY(${imgRotateY}deg) rotateX(${imgRotateX}deg) scale(${imgScale})`,
+            }}
+          >
+            <div className="problem-image-frame">
+              <span
+                className="problem-image-glow"
+                style={{ opacity: glowOpacity }}
+                aria-hidden="true"
+              />
+              <span
+                className="problem-image-scan"
+                style={{ transform: `translateY(${scanLineY}%)`, opacity: overlayActive }}
+                aria-hidden="true"
+              />
+              <span className="problem-image-grid" aria-hidden="true" />
+              <Image
+                src="/building.jpeg"
+                alt="Modern multi-unit building exterior"
+                fill
+                sizes="(max-width: 1024px) 100vw, 40vw"
+                className="problem-image"
+                style={{
+                  transform: `scale(${imgInnerZoom})`,
+                  filter: `brightness(${imgBrightness})`,
+                }}
+              />
+            </div>
           </div>
 
+          <div
+            className="problem-copy"
+            style={{
+              opacity: problemReveal,
+              transform: `translate3d(0, ${copyTranslateY}px, 0) scale(${0.985 + problemIntroProgress * 0.015})`,
+            }}
+          >
+            <div
+              className="section-tag problem-tag"
+              style={{
+                opacity: tagOpacity,
+                transform: `translateY(${tagSlide}px)`,
+              }}
+            >
+              The Problem
+            </div>
+            <h2
+              className="section-headline problem-headline"
+            >
+              <span className="typewriter-live" aria-live="polite">
+                <span className="typewriter-text">
+                  {HEADLINE_TEXT.slice(0, typedCount).slice(
+                    0,
+                    Math.max(0, HEADLINE_TEXT.indexOf("exact")),
+                  )}
+                  <span className="typewriter-accent">
+                    {HEADLINE_TEXT.slice(
+                      Math.max(0, HEADLINE_TEXT.indexOf("exact")),
+                      Math.min(typedCount, HEADLINE_TEXT.length),
+                    )}
+                  </span>
+                </span>
+                {caretVisible && (
+                  <span className="caret" aria-hidden="true">
+                    |
+                  </span>
+                )}
+              </span>
+            </h2>
+
+            <div
+              className="problem-statement animate"
+              aria-live="polite"
+            >
+              <p style={{ opacity: stmt1 }}>
+                The last mile or feet of locating the destination often becomes{" "}
+                <strong>guess work.</strong>
+              </p>
+              <p style={{ opacity: stmt2 }}>
+                This problem is exacerbated in dense apartment complexes,
+                hospitals, office campuses, and logistics hubs.
+              </p>
+              <p style={{ opacity: stmt3 }}>
+                For a delivery driver, that means wasted time. For an ambulance
+                crew,
+                <strong> it can cost lives.</strong>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="problem-grid">
           <div className="problem-cards fade-up">
             {problemCards.map(({ title, description, icon: Icon, urgent }) => (
-              <div key={title} className={`problem-card ${urgent ? 'urgent' : ''}`}>
-                <Icon className={`problem-icon ${urgent ? 'urgent-icon' : ''}`} />
+              <div
+                key={title}
+                className={`problem-card ${urgent ? "urgent" : ""}`}
+              >
+                <Icon
+                  className={`problem-icon ${urgent ? "urgent-icon" : ""}`}
+                />
                 <h3>{title}</h3>
                 <p>{description}</p>
               </div>
@@ -253,10 +480,59 @@ export default function HomeSections() {
         </div>
       </section>
 
+      <section className="index-section video-break" aria-label="Keiros in action">
+        <div className="video-shell">
+          <div className="video-frame">
+            <video
+              ref={videoRef}
+              className="hero-video"
+              src="/video.mp4"
+              autoPlay
+              muted
+              loop
+              playsInline
+              poster="/banner-hero.png"
+            />
+            <span className="video-sheen" aria-hidden="true" />
+            <span className="video-grid" aria-hidden="true" />
+            <div className="video-hud" aria-hidden="true">
+              <span className="hud-dot" />
+              <span className="hud-pill">±3 ft + elevation</span>
+            </div>
+          </div>
+          <div className="video-overlay">
+            <div className="video-tag">Keiros Demo</div>
+            <p className="video-caption">
+              See how precise, floor-aware guidance feels in motion.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section id="solution" className="index-section-block solution-section">
         <div className="section-inner">
-          <div className="section-tag">The Solution</div>
-    <h2 className="section-headline">PLACE IT.<br/>MAP IT.<br/><em>FIND IT.</em></h2>
+           <div className="section-tag">The Solution</div>
+    {/*<h2 className="section-headline">PLACE IT.<br/>MAP IT.<br/><em>FIND IT.</em></h2> */}
+    <div className="solution-header">
+            <h2 className="section-headline">
+              PLACE IT.
+              <br />
+              MAP IT.
+              <br />
+              <em>FIND IT.</em>
+            </h2>
+            <div className="solution-banner">
+              <Image
+                src="/banner-hero.png"
+                alt="Keiros precision mapping"
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="solution-banner-img"
+                priority
+              />
+              <div className="banner-glow" aria-hidden="true" />
+            </div>
+          </div>
 
 
           <div className="solution-layout">
@@ -274,11 +550,11 @@ export default function HomeSections() {
                   <div key={floor} className={`floor ${index === 3 ? 'active' : ''}`}>
                     {floor}
                     {index === 3 ? <span className="floor-pin" /> : null}
-                  </div>
+            </div>
                 ))}
               </div>
               <div className="accuracy-callout">+/- 3 FT + ELEVATION</div>
-            </div>
+          </div>
 
             <div className="solution-points">
               {solutionPoints.map((point, index) => (
@@ -291,6 +567,7 @@ export default function HomeSections() {
                 </div>
               ))}
             </div>
+            
           </div>
         </div>
       </section>
@@ -300,11 +577,18 @@ export default function HomeSections() {
         Use Cases
       */}
 
-      <section id="howitworks" ref={howItWorksRef} className="index-section-block howitworks-section">
+      <section
+        id="howitworks"
+        ref={howItWorksRef}
+        className="index-section-block howitworks-section"
+      >
         <div className="section-inner">
           <div className="section-tag">How It Works</div>
-    <h2 className="section-headline">SIMPLE TO DEPLOY.<br/><em>POWERFUL</em> AT SCALE.</h2>
-
+          <h2 className="section-headline">
+            SIMPLE TO DEPLOY.
+            <br />
+            <em>POWERFUL</em> AT SCALE.
+          </h2>
 
           <div className="steps-viewport">
             <div
@@ -320,23 +604,30 @@ export default function HomeSections() {
               {steps.map(({ title, description, icon: Icon }, index) => (
                 <article
                   key={title}
-                  className={`step ${activeStepIndex === index ? 'active-step' : ''}`}
+                  className={`step ${activeStepIndex === index ? "active-step" : ""}`}
                   style={(() => {
-                    if (!desktopHowItWorks) return {} as CSSProperties
+                    if (!desktopHowItWorks) return {} as CSSProperties;
 
-                    const distance = Math.abs(index - activeStepFloat)
+                    const distance = Math.abs(index - activeStepFloat);
 
                     return {
                       opacity: Math.max(0.42, 1 - distance * 0.22),
                       transform: `translateY(${Math.min(distance * 10, 14)}px) scale(${1 - Math.min(distance * 0.04, 0.08)})`,
-                    } as CSSProperties
+                    } as CSSProperties;
                   })()}
                 >
                   <div className="step-topline">
-                    <span className="step-chip">STEP {String(index + 1).padStart(2, '0')}</span>
-                    <span className="step-seq">{String(index + 1).padStart(2, '0')} / {String(steps.length).padStart(2, '0')}</span>
+                    <span className="step-chip">
+                      STEP {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span className="step-seq">
+                      {String(index + 1).padStart(2, "0")} /{" "}
+                      {String(steps.length).padStart(2, "0")}
+                    </span>
                   </div>
-                  <div className="step-num">{String(index + 1).padStart(2, '0')}</div>
+                  <div className="step-num">
+                    {String(index + 1).padStart(2, "0")}
+                  </div>
                   <div className="step-icon-wrap">
                     <Icon className="step-icon" />
                   </div>
@@ -346,7 +637,9 @@ export default function HomeSections() {
                   </div>
                   <div className="step-footer">
                     <span className="step-rail" />
-                    <span className="step-footnote">Keiros deployment flow</span>
+                    <span className="step-footnote">
+                      Keiros deployment flow
+                    </span>
                   </div>
                 </article>
               ))}
@@ -355,7 +648,7 @@ export default function HomeSections() {
               {steps.map((step, index) => (
                 <span
                   key={step.title}
-                  className={`steps-dot ${activeStepIndex === index ? 'active-dot' : ''}`}
+                  className={`steps-dot ${activeStepIndex === index ? "active-dot" : ""}`}
                 />
               ))}
             </div>
@@ -364,9 +657,14 @@ export default function HomeSections() {
       </section>
 
       <section id="developers" className="index-section developers-section">
-        <div className="section-tag">For Developers</div>
-  <h2 className="section-headline">BUILT TO<br/><em>INTEGRATE,</em><br/>NOT REPLACE.</h2>
-
+        <div className="section-tag">For Commercial Use</div>
+        <h2 className="section-headline">
+          BUILT TO
+          <br />
+          <em>INTEGRATE,</em>
+          <br />
+          NOT REPLACE.
+        </h2>
 
         <div className="dev-layout">
           <div className="dev-text">
@@ -384,10 +682,6 @@ export default function HomeSections() {
                 </div>
               ))}
             </div>
-
-            <Link href="#contact" className="btn-primary">
-              Request SDK Access
-            </Link>
           </div>
 
           <div className="code-block">
@@ -404,11 +698,11 @@ export default function HomeSections() {
                 <span className="code-line">
                   <span className="line-no">1</span>
                   <span>
-                    <span className="token-keyword">import</span>{' '}
-                    <span className="token-punctuation">{'{'}</span>{' '}
-                    <span className="token-class">KeirosClient</span>{' '}
-                    <span className="token-punctuation">{'}'}</span>{' '}
-                    <span className="token-keyword">from</span>{' '}
+                    <span className="token-keyword">import</span>{" "}
+                    <span className="token-punctuation">{"{"}</span>{" "}
+                    <span className="token-class">KeirosClient</span>{" "}
+                    <span className="token-punctuation">{"}"}</span>{" "}
+                    <span className="token-keyword">from</span>{" "}
                     <span className="token-string">'@keiros/sdk'</span>
                   </span>
                 </span>
@@ -419,21 +713,21 @@ export default function HomeSections() {
                 <span className="code-line">
                   <span className="line-no">3</span>
                   <span>
-                    <span className="token-keyword">const</span>{' '}
-                    <span className="token-variable">keiros</span>{' '}
-                    <span className="token-operator">=</span>{' '}
-                    <span className="token-keyword">new</span>{' '}
+                    <span className="token-keyword">const</span>{" "}
+                    <span className="token-variable">keiros</span>{" "}
+                    <span className="token-operator">=</span>{" "}
+                    <span className="token-keyword">new</span>{" "}
                     <span className="token-class">KeirosClient</span>
                     <span className="token-punctuation">(</span>
-                    <span className="token-punctuation">{'{'}</span>
+                    <span className="token-punctuation">{"{"}</span>
                   </span>
                 </span>
                 <span className="code-line">
                   <span className="line-no">4</span>
                   <span>
-                    {'  '}
+                    {"  "}
                     <span className="token-property">apiKey</span>
-                    <span className="token-punctuation">:</span>{' '}
+                    <span className="token-punctuation">:</span>{" "}
                     <span className="token-variable">process</span>
                     <span className="token-punctuation">.</span>
                     <span className="token-variable">env</span>
@@ -445,7 +739,7 @@ export default function HomeSections() {
                 <span className="code-line">
                   <span className="line-no">5</span>
                   <span>
-                    <span className="token-punctuation">{'}'}</span>
+                    <span className="token-punctuation">{"}"}</span>
                     <span className="token-punctuation">)</span>
                   </span>
                 </span>
@@ -456,31 +750,33 @@ export default function HomeSections() {
                 <span className="code-line">
                   <span className="line-no">7</span>
                   <span>
-                    <span className="token-keyword">const</span>{' '}
-                    <span className="token-variable">location</span>{' '}
-                    <span className="token-operator">=</span>{' '}
-                    <span className="token-keyword">await</span>{' '}
+                    <span className="token-keyword">const</span>{" "}
+                    <span className="token-variable">location</span>{" "}
+                    <span className="token-operator">=</span>{" "}
+                    <span className="token-keyword">await</span>{" "}
                     <span className="token-variable">keiros</span>
                     <span className="token-punctuation">.</span>
                     <span className="token-function">resolve</span>
                     <span className="token-punctuation">(</span>
-                    <span className="token-punctuation">{'{'}</span>
+                    <span className="token-punctuation">{"{"}</span>
                   </span>
                 </span>
                 <span className="code-line">
                   <span className="line-no">8</span>
                   <span>
-                    {'  '}
+                    {"  "}
                     <span className="token-property">address</span>
-                    <span className="token-punctuation">:</span>{' '}
-                    <span className="token-string">'Apt 304, Sunset Towers'</span>
+                    <span className="token-punctuation">:</span>{" "}
+                    <span className="token-string">
+                      'Apt 304, Sunset Towers'
+                    </span>
                     <span className="token-punctuation">,</span>
                   </span>
                 </span>
                 <span className="code-line">
                   <span className="line-no">9</span>
                   <span>
-                    <span className="token-punctuation">{'}'}</span>
+                    <span className="token-punctuation">{"}"}</span>
                     <span className="token-punctuation">)</span>
                   </span>
                 </span>
@@ -491,7 +787,7 @@ export default function HomeSections() {
                 <span className="code-line">
                   <span className="line-no">11</span>
                   <span>
-                    <span className="token-keyword">await</span>{' '}
+                    <span className="token-keyword">await</span>{" "}
                     <span className="token-variable">mapProvider</span>
                     <span className="token-punctuation">.</span>
                     <span className="token-function">navigateTo</span>
@@ -506,11 +802,11 @@ export default function HomeSections() {
         </div>
       </section>
 
+      {/* Pricing section hidden for now
       <section id="pricing" className="index-section-block pricing-section">
         <div className="pricing-inner">
           <div className="section-tag">Pricing</div>
     <h2 className="section-headline">THE DEVICE IS <em>FREE.</em><br/>PAY ONLY FOR WHAT YOU USE.</h2>
-
 
           <div className="pricing-grid">
             {pricingPlans.map((plan) => (
@@ -538,12 +834,17 @@ export default function HomeSections() {
           </div>
         </div>
       </section>
+      */}
 
       <section id="contact" className="index-section contact-section">
         <div className="contact-inner">
           <div className="section-tag">Get Early Access</div>
-      <h2 className="section-headline">BE FIRST.<br/>BE <em>PRECISE.</em></h2>
-      
+          <h2 className="section-headline">
+            BE FIRST.
+            <br />
+            BE <em>PRECISE.</em>
+          </h2>
+
           <p className="contact-sub">
             Keiros is onboarding early access partners across logistics,
             emergency services, property operations, and developer platforms.
@@ -551,11 +852,27 @@ export default function HomeSections() {
 
           <form className="contact-form">
             <div className="form-row">
-              <input type="text" className="form-input" placeholder="First Name" />
-              <input type="text" className="form-input" placeholder="Last Name" />
+              <input
+                type="text"
+                className="form-input"
+                placeholder="First Name"
+              />
+              <input
+                type="text"
+                className="form-input"
+                placeholder="Last Name"
+              />
             </div>
-            <input type="email" className="form-input" placeholder="Work Email" />
-            <input type="text" className="form-input" placeholder="Company / Organization" />
+            <input
+              type="email"
+              className="form-input"
+              placeholder="Work Email"
+            />
+            <input
+              type="text"
+              className="form-input"
+              placeholder="Company / Organization"
+            />
             <select className="form-input" defaultValue="">
               <option value="" disabled>
                 I am a...
@@ -567,7 +884,11 @@ export default function HomeSections() {
               <option>Software Developer</option>
               <option>Other</option>
             </select>
-            <textarea rows={4} className="form-input" placeholder="Tell us about your use case" />
+            <textarea
+              rows={4}
+              className="form-input"
+              placeholder="Tell us about your use case"
+            />
             <button type="submit" className="form-submit">
               Request Early Access
             </button>
@@ -575,13 +896,15 @@ export default function HomeSections() {
 
           <div className="contact-alts">
             <div>
-              Investor inquiries: <a href="mailto:invest@keiros.io">invest@keiros.io</a>
+              Investor inquiries:{" "}
+              <a href="mailto:invest@keiros.ai">invest@keiros.ai</a>
             </div>
             <div>
-              Partnerships: <a href="mailto:partners@keiros.io">partners@keiros.io</a>
+              Sales: <a href="mailto:sales@keiros.ai">sales@keiros.ai</a>
             </div>
             <div>
-              Press: <a href="mailto:press@keiros.io">press@keiros.io</a>
+              Partners:{" "}
+              <a href="mailto:partners@keiros.ai">partners@keiros.ai</a>
             </div>
           </div>
         </div>
@@ -594,7 +917,7 @@ export default function HomeSections() {
           --keiros-accent: #5bc9f0;
           --keiros-accent-foreground: #050607;
           color: var(--color-foreground);
-          font-family: 'DM Sans', sans-serif;
+          font-family: "DM Sans", sans-serif;
         }
 
         .index-banner-section {
@@ -630,7 +953,12 @@ export default function HomeSections() {
           padding: 32px;
           border: 1px solid rgba(255, 255, 255, 0.08);
           border-radius: 32px;
-          background: radial-gradient(circle at center, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.03) 40%, transparent 70%);
+          background: radial-gradient(
+            circle at center,
+            rgba(255, 255, 255, 0.14),
+            rgba(255, 255, 255, 0.03) 40%,
+            transparent 70%
+          );
         }
 
         .banner-image {
@@ -663,7 +991,16 @@ export default function HomeSections() {
         }
 
         .solution-section {
-          background: linear-gradient(180deg, var(--color-background) 0%, color-mix(in oklab, var(--color-background) 78%, var(--keiros-accent) 22%) 100%);
+          background: linear-gradient(
+            180deg,
+            var(--color-background) 0%,
+            color-mix(
+                in oklab,
+                var(--color-background) 78%,
+                var(--keiros-accent) 22%
+              )
+              100%
+          );
         }
 
         .howitworks-section {
@@ -690,7 +1027,7 @@ export default function HomeSections() {
         }
 
         .developers-section::before {
-          content: '';
+          content: "";
           position: absolute;
           top: -224px;
           right: -112px;
@@ -704,7 +1041,7 @@ export default function HomeSections() {
         }
 
         .developers-section::after {
-          content: '';
+          content: "";
           position: absolute;
           top: -176px;
           right: 0;
@@ -737,7 +1074,9 @@ export default function HomeSections() {
         .howitworks-section .section-headline {
           opacity: 0.22;
           transform: translateY(28px);
-          transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+          transition:
+            opacity 0.9s ease,
+            transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         .howitworks-section .section-headline.visible {
@@ -749,28 +1088,29 @@ export default function HomeSections() {
           background: var(--color-background);
         }
 
-         .section-tag {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+        .section-tag {
+          font-family: var(--font-mono);
+          font-size: 0.7rem;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: var(--accent);
+          margin-bottom: 20px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
 
-  .section-tag::before {
-    content: '';
-    display: inline-block;
-    width: 24px; height: 1px;
-    background: var(--accent);
-  }
+        .section-tag::before {
+          content: "";
+          display: inline-block;
+          width: 24px;
+          height: 1px;
+          background: var(--accent);
+        }
 
         .section-headline {
           margin: 0 0 32px;
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: "Bebas Neue", sans-serif;
           font-size: clamp(3.5rem, 6vw, 5.25rem);
           font-weight: 700;
           line-height: 0.92;
@@ -796,6 +1136,59 @@ export default function HomeSections() {
           gap: 36px;
         }
 
+        .problem-intro {
+          display: grid;
+          grid-template-columns: minmax(300px, 0.95fr) minmax(0, 1.05fr);
+          gap: 48px;
+          align-items: start;
+          margin-top: 12px;
+        }
+
+        .problem-copy {
+          display: flex;
+          flex-direction: column;
+          will-change: transform, opacity;
+          transition:
+            transform 0.22s ease-out,
+            opacity 0.22s ease-out;
+          gap: 10px;
+        }
+
+        .problem-tag {
+          will-change: transform, opacity;
+        }
+
+        .problem-headline {
+          will-change: clip-path, opacity;
+          transition: clip-path 0.38s ease-out;
+          overflow: hidden;
+        }
+
+        .typewriter-live {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          white-space: pre-wrap;
+          min-height: 1.1em;
+        }
+
+        .typewriter-text {
+          display: inline;
+        }
+
+        .typewriter-accent {
+          color: var(--keiros-accent);
+        }
+
+        .typewriter-live .caret {
+          display: inline-block;
+          width: 2px;
+          height: 1em;
+          background: var(--keiros-accent);
+          animation: caret 0.8s step-end infinite;
+        }
+
         .dev-layout {
           grid-template-columns: 1fr 1fr;
           position: relative;
@@ -803,9 +1196,40 @@ export default function HomeSections() {
         }
 
         .solution-layout {
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+          align-items: start;
+          gap: 80px;
+        }
+
+        .solution-header {
+          display: grid;
+          grid-template-columns: 1fr minmax(320px, 520px);
+          gap: 48px;
           align-items: center;
-          gap: 100px;
+          margin-bottom: 36px;
+        }
+
+        .solution-banner {
+          position: relative;
+          width: 100%;
+          height: clamp(260px, 40vw, 460px);
+          border-radius: 32px;
+          overflow: hidden;
+          isolation: isolate;
+        }
+
+        .solution-banner-img {
+          object-fit: cover;
+        }
+
+        .banner-glow {
+          position: absolute;
+          inset: auto auto 8% 8%;
+          width: 52%;
+          height: 34%;
+          filter: blur(38px);
+          opacity: 0.55;
+          pointer-events: none;
         }
 
         .problem-statement {
@@ -813,15 +1237,143 @@ export default function HomeSections() {
           font-size: 1.25rem;
           font-weight: 300;
           line-height: 1.75;
+          padding-top: 10px;
+          display: grid;
+          gap: 12px;
         }
 
         .problem-statement p {
-          margin: 0 0 24px;
+          margin: 0;
+          opacity: 0;
+          transform: translateY(24px);
+          filter: blur(6px);
+        }
+
+        .problem-statement p:last-child {
+          margin-bottom: 0;
         }
 
         .problem-statement strong {
           color: var(--color-foreground);
           font-weight: 500;
+        }
+
+        .problem-statement.animate p:nth-child(1) {
+          animation: bubbleUp 0.55s 0.08s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .problem-statement.animate p:nth-child(2) {
+          animation: bubbleUp 0.58s 0.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .problem-statement.animate p:nth-child(3) {
+          animation: bubbleUp 0.62s 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .problem-image-wrap {
+          display: flex;
+          justify-content: flex-start;
+          will-change: transform, opacity;
+          transition:
+            transform 0.22s ease-out,
+            opacity 0.22s ease-out;
+        }
+
+        .problem-image-frame {
+          position: relative;
+          width: 100%;
+          max-width: 460px;
+          aspect-ratio: 4 / 4.8;
+          overflow: hidden;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-top-right-radius: 80px;
+          border-bottom-left-radius: 80px;
+          background: rgba(255, 255, 255, 0.02);
+          box-shadow:
+            0 22px 60px rgba(0, 0, 0, 0.28),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+          isolation: isolate;
+          backdrop-filter: blur(2px);
+          overflow: clip;
+        }
+
+        .problem-image-glow {
+          position: absolute;
+          inset: auto auto -14% -10%;
+          width: 58%;
+          height: 36%;
+          border-radius: 999px;
+          background: color-mix(
+            in oklab,
+            var(--keiros-accent) 34%,
+            transparent
+          );
+          filter: blur(38px);
+          pointer-events: none;
+          z-index: 1;
+          transition: opacity 0.22s ease-out;
+        }
+
+        .problem-image-scan {
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 0;
+          height: 22%;
+          background: linear-gradient(
+            180deg,
+            rgba(91, 201, 240, 0) 0%,
+            rgba(91, 201, 240, 0.18) 48%,
+            rgba(91, 201, 240, 0) 100%
+          );
+          mix-blend-mode: screen;
+          filter: blur(2px);
+          pointer-events: none;
+          z-index: 2;
+          transition:
+            transform 0.28s ease-out,
+            opacity 0.28s ease-out;
+        }
+
+        .problem-image-grid {
+          position: absolute;
+          inset: 0;
+          background-image:
+            linear-gradient(
+              rgba(255, 255, 255, 0.05) 1px,
+              transparent 1px
+            ),
+            linear-gradient(
+              90deg,
+              rgba(255, 255, 255, 0.05) 1px,
+              transparent 1px
+            );
+          background-size: 24px 24px;
+          mix-blend-mode: soft-light;
+          opacity: 0.28;
+          pointer-events: none;
+          z-index: 1;
+        }
+
+        .problem-image-frame::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            180deg,
+            rgba(8, 10, 12, 0.02) 0%,
+            rgba(8, 10, 12, 0.28) 100%
+          );
+          pointer-events: none;
+        }
+
+        .problem-image {
+          object-fit: cover;
+          transform: scale(1.04);
+          transition:
+            transform 0.26s ease-out,
+            filter 0.26s ease-out;
+          will-change: transform, filter;
         }
 
         .problem-cards {
@@ -839,11 +1391,18 @@ export default function HomeSections() {
           border-right: 1px solid rgba(255, 255, 255, 0.16);
           border-top-right-radius: 50px;
           overflow: hidden;
-          transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+          transition:
+            transform 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+            border-color 0.35s ease,
+            box-shadow 0.35s ease,
+            opacity 0.4s ease;
+          transform: translate3d(0, 38px, 0) rotateX(10deg);
+          opacity: 0;
+          will-change: transform, opacity;
         }
 
         .problem-card::before {
-          content: '';
+          content: "";
           position: absolute;
           inset: 0;
           border-radius: inherit;
@@ -856,6 +1415,11 @@ export default function HomeSections() {
           border-top-color: rgba(255, 255, 255, 0.24);
           border-right-color: rgba(255, 255, 255, 0.24);
           box-shadow: none;
+        }
+
+        .problem-card.visible {
+          opacity: 1;
+          transform: translate3d(0, 0, 0) rotateX(0deg);
         }
 
         .problem-card.urgent {
@@ -884,7 +1448,7 @@ export default function HomeSections() {
           z-index: 1;
           margin: 0 0 10px;
           color: var(--color-foreground);
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: "Bebas Neue", sans-serif;
           font-size: 1.5rem;
           letter-spacing: 0.04em;
         }
@@ -898,7 +1462,119 @@ export default function HomeSections() {
           line-height: 1.78;
         }
 
-        .solution-visual {
+        .video-break {
+          padding: 0;
+          background: #000;
+          border-block: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .video-shell {
+          position: relative;
+          max-width: 1280px;
+          margin: 0 auto;
+          padding: 32px 48px 64px;
+        }
+
+        .video-frame {
+          position: relative;
+          border-radius: 28px;
+          overflow: hidden;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          box-shadow:
+            0 24px 60px rgba(0, 0, 0, 0.35),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08);
+          background: radial-gradient(
+              circle at 20% 20%,
+              color-mix(in oklab, var(--keiros-accent) 10%, transparent),
+              transparent 40%
+            ),
+            #06080c;
+          isolation: isolate;
+          animation: videoPulse 12s ease-in-out infinite alternate;
+        }
+
+        .hero-video {
+          width: 100%;
+          height: clamp(260px, 58vw, 620px);
+          object-fit: cover;
+          display: block;
+          transform-origin: center;
+          animation: videoDrift 18s ease-in-out infinite alternate;
+        }
+
+        .video-sheen {
+          position: absolute;
+          inset: -20%;
+          background: linear-gradient(
+            120deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.12) 18%,
+            rgba(255, 255, 255, 0.02) 28%,
+            transparent 44%
+          );
+          mix-blend-mode: screen;
+          animation: sheen 6s linear infinite;
+          pointer-events: none;
+          z-index: 2;
+        }
+
+        .video-grid {
+          position: absolute;
+          inset: 0;
+          background-image:
+            linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+          background-size: 30px 30px;
+          mix-blend-mode: soft-light;
+          opacity: 0.14;
+          pointer-events: none;
+          z-index: 1;
+        }
+
+        .video-hud {
+          position: absolute;
+          top: 18px;
+          right: 18px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 10px 14px;
+          background: rgba(0, 0, 0, 0.55);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 999px;
+          backdrop-filter: blur(6px);
+          z-index: 3;
+        }
+
+        .hud-dot {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: var(--keiros-accent);
+          box-shadow: 0 0 12px var(--keiros-accent);
+          animation: pulse 1.8s ease-in-out infinite;
+        }
+
+        .hud-pill {
+          font-family: "DM Mono", monospace;
+          font-size: 0.7rem;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: rgba(244, 242, 238, 0.9);
+        }
+
+        .video-overlay {
+          position: absolute;
+          left: 64px;
+          bottom: 64px;
+          padding: 14px 18px;
+          background: rgba(0, 0, 0, 0.55);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 14px;
+          backdrop-filter: blur(8px);
+          max-width: min(540px, 80vw);
+        }
+           .solution-visual {
           position: sticky;
           top: 140px;
           display: flex;
@@ -1009,6 +1685,103 @@ export default function HomeSections() {
           border-left: none;
         }
 
+        .video-tag {
+          display: inline-block;
+          font-family: "DM Mono", monospace;
+          font-size: 0.68rem;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: var(--keiros-accent);
+          margin-bottom: 6px;
+        }
+
+        .video-caption {
+          margin: 0;
+          color: rgba(244, 242, 238, 0.86);
+          font-size: 1rem;
+          line-height: 1.6;
+        }
+
+        @keyframes sheen {
+          0% {
+            transform: translateX(-40%);
+          }
+          100% {
+            transform: translateX(40%);
+          }
+        }
+
+        @keyframes videoPulse {
+          0% {
+            transform: translateY(0) scale(1);
+          }
+          100% {
+            transform: translateY(-6px) scale(1.01);
+          }
+        }
+
+        @keyframes videoDrift {
+          0% {
+            transform: scale(1.02);
+          }
+          100% {
+            transform: scale(1.06);
+          }
+        }
+
+        @keyframes pulse {
+          0%,
+          100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+          50% {
+            transform: scale(1.18);
+            opacity: 0.6;
+          }
+        }
+
+        .solution-header {
+          display: grid;
+          grid-template-columns: 1fr minmax(320px, 520px);
+          gap: 48px;
+          align-items: center;
+          margin-bottom: 32px;
+        }
+
+        .solution-visual {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: clamp(260px, 40vw, 520px);
+        }
+
+        .solution-banner {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          border-radius: 32px;
+          overflow: hidden;
+          isolation: isolate;
+        }
+
+        .solution-banner-img {
+          object-fit: cover;
+        }
+
+        .banner-glow {
+          position: absolute;
+          inset: auto auto 8% 8%;
+          width: 52%;
+          height: 34%;
+          border-radius: 999px;
+          background: color-mix(in oklab, var(--keiros-accent) 30%, transparent);
+          filter: blur(38px);
+          opacity: 0.55;
+          pointer-events: none;
+        }
+
         .solution-points {
           display: flex;
           flex-direction: column;
@@ -1024,7 +1797,9 @@ export default function HomeSections() {
           padding: 18px 0;
           opacity: 0.18;
           transform: translateY(72px);
-          transition: opacity 0.85s ease, transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+          transition:
+            opacity 0.85s ease,
+            transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         .solution-point.visible {
@@ -1035,7 +1810,7 @@ export default function HomeSections() {
         .point-num {
           min-width: 48px;
           color: color-mix(in oklab, var(--keiros-accent) 15%, transparent);
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: "Bebas Neue", sans-serif;
           font-size: 3rem;
           line-height: 1;
           transition: color 0.2s;
@@ -1049,7 +1824,7 @@ export default function HomeSections() {
         .step h3 {
           margin: 0 0 8px;
           color: var(--color-foreground);
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: "Bebas Neue", sans-serif;
           letter-spacing: 0.04em;
         }
 
@@ -1095,7 +1870,11 @@ export default function HomeSections() {
           min-height: 500px;
           padding: 34px 38px 38px;
           background:
-            radial-gradient(circle at top right, color-mix(in oklab, var(--keiros-accent) 18%, transparent), transparent 34%),
+            radial-gradient(
+              circle at top right,
+              color-mix(in oklab, var(--keiros-accent) 18%, transparent),
+              transparent 34%
+            ),
             linear-gradient(180deg, rgba(18, 25, 34, 0.98), rgba(8, 12, 17, 1));
           border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 34px;
@@ -1117,30 +1896,46 @@ export default function HomeSections() {
         }
 
         .step::before {
-          content: '';
+          content: "";
           position: absolute;
           inset: 0;
           background:
             linear-gradient(135deg, rgba(255, 255, 255, 0.04), transparent 38%),
-            radial-gradient(circle at bottom left, color-mix(in oklab, var(--keiros-accent) 10%, transparent), transparent 32%);
+            radial-gradient(
+              circle at bottom left,
+              color-mix(in oklab, var(--keiros-accent) 10%, transparent),
+              transparent 32%
+            );
           pointer-events: none;
         }
 
         .step::after {
-          content: '';
+          content: "";
           position: absolute;
           inset: auto 0 0 0;
           height: 4px;
-          background: linear-gradient(90deg, var(--keiros-accent), transparent 70%);
+          background: linear-gradient(
+            90deg,
+            var(--keiros-accent),
+            transparent 70%
+          );
           opacity: 0.4;
           pointer-events: none;
         }
 
         .step.active-step {
           background:
-            radial-gradient(circle at top right, color-mix(in oklab, var(--keiros-accent) 22%, transparent), transparent 34%),
+            radial-gradient(
+              circle at top right,
+              color-mix(in oklab, var(--keiros-accent) 22%, transparent),
+              transparent 34%
+            ),
             linear-gradient(180deg, rgba(22, 32, 42, 1), rgba(10, 14, 19, 1));
-          border-color: color-mix(in oklab, var(--keiros-accent) 24%, rgba(255, 255, 255, 0.12));
+          border-color: color-mix(
+            in oklab,
+            var(--keiros-accent) 24%,
+            rgba(255, 255, 255, 0.12)
+          );
           box-shadow:
             inset 0 1px 0 rgba(255, 255, 255, 0.06),
             0 34px 90px rgba(0, 0, 0, 0.38);
@@ -1163,7 +1958,7 @@ export default function HomeSections() {
         .step-chip,
         .step-seq,
         .step-footnote {
-          font-family: 'DM Mono', monospace;
+          font-family: "DM Mono", monospace;
           font-size: 0.72rem;
           letter-spacing: 0.12em;
           text-transform: uppercase;
@@ -1171,7 +1966,12 @@ export default function HomeSections() {
 
         .step-chip {
           padding: 10px 14px;
-          border: 1px solid color-mix(in oklab, var(--keiros-accent) 18%, rgba(255, 255, 255, 0.08));
+          border: 1px solid
+            color-mix(
+              in oklab,
+              var(--keiros-accent) 18%,
+              rgba(255, 255, 255, 0.08)
+            );
           border-radius: 999px;
           color: var(--keiros-accent);
           background: color-mix(in oklab, var(--keiros-accent) 6%, transparent);
@@ -1186,7 +1986,7 @@ export default function HomeSections() {
           top: 88px;
           right: 34px;
           color: color-mix(in oklab, var(--keiros-accent) 12%, transparent);
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: "Bebas Neue", sans-serif;
           font-size: clamp(5.5rem, 10vw, 8rem);
           line-height: 0.85;
           letter-spacing: 0.04em;
@@ -1200,9 +2000,18 @@ export default function HomeSections() {
           height: 76px;
           place-items: center;
           margin-bottom: 26px;
-          border: 1px solid color-mix(in oklab, var(--keiros-accent) 22%, rgba(255, 255, 255, 0.1));
+          border: 1px solid
+            color-mix(
+              in oklab,
+              var(--keiros-accent) 22%,
+              rgba(255, 255, 255, 0.1)
+            );
           border-radius: 24px;
-          background: linear-gradient(180deg, rgba(10, 17, 24, 0.96), rgba(5, 9, 13, 0.96));
+          background: linear-gradient(
+            180deg,
+            rgba(10, 17, 24, 0.96),
+            rgba(5, 9, 13, 0.96)
+          );
           box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
         }
 
@@ -1210,7 +2019,9 @@ export default function HomeSections() {
           position: relative;
           z-index: 1;
           color: var(--keiros-accent);
-          transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), color 0.3s ease;
+          transition:
+            transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+            color 0.3s ease;
         }
 
         .step h3 {
@@ -1256,7 +2067,11 @@ export default function HomeSections() {
           display: block;
           flex: 1;
           height: 1px;
-          background: linear-gradient(90deg, var(--keiros-accent), rgba(255, 255, 255, 0.08));
+          background: linear-gradient(
+            90deg,
+            var(--keiros-accent),
+            rgba(255, 255, 255, 0.08)
+          );
         }
 
         .steps-dots {
@@ -1274,7 +2089,9 @@ export default function HomeSections() {
           height: 10px;
           border-radius: 999px;
           background: rgba(255, 255, 255, 0.18);
-          transition: transform 0.3s ease, background 0.3s ease;
+          transition:
+            transform 0.3s ease,
+            background 0.3s ease;
         }
 
         .steps-dot.active-dot {
@@ -1302,18 +2119,29 @@ export default function HomeSections() {
           align-items: flex-start;
           gap: 16px;
           padding: 16px;
-          background: linear-gradient(180deg, rgba(8, 13, 18, 0.86), rgba(5, 9, 13, 0.92));
+          background: linear-gradient(
+            180deg,
+            rgba(8, 13, 18, 0.86),
+            rgba(5, 9, 13, 0.92)
+          );
           border: 1px solid rgba(255, 255, 255, 0.1);
           border-left: 2px solid transparent;
           border-radius: 22px;
           backdrop-filter: blur(10px);
-          transition: border-color 0.2s, transform 0.2s, background 0.2s;
+          transition:
+            border-color 0.2s,
+            transform 0.2s,
+            background 0.2s;
         }
 
         .sdk-feature:hover {
           border-left-color: var(--keiros-accent);
           transform: translateY(-2px);
-          background: linear-gradient(180deg, rgba(10, 18, 24, 0.94), rgba(6, 10, 14, 0.98));
+          background: linear-gradient(
+            180deg,
+            rgba(10, 18, 24, 0.94),
+            rgba(6, 10, 14, 0.98)
+          );
         }
 
         .sdk-check {
@@ -1331,24 +2159,37 @@ export default function HomeSections() {
         .code-block {
           position: relative;
           overflow: hidden;
-          border: 1px solid color-mix(in oklab, var(--keiros-accent) 18%, rgba(255, 255, 255, 0.1));
+          border: 1px solid
+            color-mix(
+              in oklab,
+              var(--keiros-accent) 18%,
+              rgba(255, 255, 255, 0.1)
+            );
           border-radius: 26px;
-          background: linear-gradient(180deg, rgba(10, 15, 21, 0.98), rgba(7, 10, 15, 1));
+          background: linear-gradient(
+            180deg,
+            rgba(10, 15, 21, 0.98),
+            rgba(7, 10, 15, 1)
+          );
           box-shadow:
             inset 0 1px 0 rgba(255, 255, 255, 0.05),
             0 24px 80px rgba(0, 0, 0, 0.28);
           color: #d4d4d4;
-          font-family: 'DM Mono', monospace;
+          font-family: "DM Mono", monospace;
           font-size: 0.85rem;
           line-height: 1.9;
         }
 
         .code-block::before {
-          content: '';
+          content: "";
           position: absolute;
           inset: 0;
           pointer-events: none;
-          background: radial-gradient(circle at top left, color-mix(in oklab, var(--keiros-accent) 12%, transparent), transparent 34%);
+          background: radial-gradient(
+            circle at top left,
+            color-mix(in oklab, var(--keiros-accent) 12%, transparent),
+            transparent 34%
+          );
         }
 
         .code-toolbar {
@@ -1455,7 +2296,10 @@ export default function HomeSections() {
           letter-spacing: 0.06em;
           text-decoration: none;
           text-transform: uppercase;
-          transition: background 0.2s, border-color 0.2s, transform 0.2s;
+          transition:
+            background 0.2s,
+            border-color 0.2s,
+            transform 0.2s;
         }
 
         .btn-primary {
@@ -1526,7 +2370,7 @@ export default function HomeSections() {
           padding: 4px 12px;
           background: rgba(255, 255, 255, 0.06);
           color: var(--color-muted-foreground);
-          font-family: 'DM Mono', monospace;
+          font-family: "DM Mono", monospace;
           font-size: 0.65rem;
           letter-spacing: 0.16em;
           text-transform: uppercase;
@@ -1539,7 +2383,7 @@ export default function HomeSections() {
         .plan-name {
           margin-bottom: 8px;
           color: var(--color-foreground);
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: "Bebas Neue", sans-serif;
           font-size: 2.2rem;
           letter-spacing: 0.04em;
         }
@@ -1547,7 +2391,7 @@ export default function HomeSections() {
         .plan-price {
           margin-bottom: 4px;
           color: var(--keiros-accent);
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: "Bebas Neue", sans-serif;
           font-size: 3.5rem;
           line-height: 1;
         }
@@ -1555,7 +2399,7 @@ export default function HomeSections() {
         .plan-cycle {
           margin-bottom: 32px;
           color: var(--color-muted-foreground);
-          font-family: 'DM Mono', monospace;
+          font-family: "DM Mono", monospace;
           font-size: 0.72rem;
           letter-spacing: 0.1em;
         }
@@ -1578,7 +2422,7 @@ export default function HomeSections() {
         }
 
         .feature-item::before {
-          content: '->';
+          content: "->";
           position: absolute;
           left: 0;
           color: var(--keiros-accent);
@@ -1602,7 +2446,7 @@ export default function HomeSections() {
         }
 
         .contact-section::before {
-          content: 'KEIROS';
+          content: "KEIROS";
           position: absolute;
           top: 50%;
           left: 50%;
@@ -1610,7 +2454,7 @@ export default function HomeSections() {
           width: 100%;
           text-align: center;
           color: color-mix(in oklab, var(--keiros-accent) 6%, transparent);
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: "Bebas Neue", sans-serif;
           font-size: min(24vw, 18rem);
           letter-spacing: 0.05em;
           line-height: 1;
@@ -1654,7 +2498,7 @@ export default function HomeSections() {
           background: #1c1f23;
           border: 1px solid rgba(255, 255, 255, 0.08);
           color: var(--color-foreground);
-          font-family: 'DM Sans', sans-serif;
+          font-family: "DM Sans", sans-serif;
           font-size: 0.95rem;
           outline: none;
         }
@@ -1674,7 +2518,7 @@ export default function HomeSections() {
           border: none;
           background: var(--keiros-accent);
           color: var(--keiros-accent-foreground);
-          font-family: 'DM Sans', sans-serif;
+          font-family: "DM Sans", sans-serif;
           font-size: 0.9rem;
           font-weight: 600;
           letter-spacing: 0.06em;
@@ -1712,6 +2556,37 @@ export default function HomeSections() {
           }
         }
 
+        @keyframes bubbleUp {
+          0% {
+            opacity: 0;
+            transform: translateY(24px) scale(0.985);
+            filter: blur(6px);
+          }
+
+          60% {
+            opacity: 1;
+            transform: translateY(-4px) scale(1.005);
+            filter: blur(0);
+          }
+
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+          }
+        }
+
+        @keyframes caret {
+          0%,
+          49% {
+            opacity: 1;
+          }
+          50%,
+          100% {
+            opacity: 0;
+          }
+        }
+
         @media (max-width: 1024px) {
           .index-banner-section,
           .index-section,
@@ -1724,6 +2599,10 @@ export default function HomeSections() {
           .contact-inner {
             padding-left: 24px;
             padding-right: 24px;
+          }
+
+          .solution-header {
+            grid-template-columns: 1fr;
           }
 
           .solution-layout,
@@ -1807,6 +2686,19 @@ export default function HomeSections() {
           .problem-cards {
             grid-template-columns: 1fr;
           }
+
+          .problem-intro {
+            grid-template-columns: 1fr;
+          }
+
+          .problem-image-wrap {
+            justify-content: flex-start;
+            transform: none !important;
+          }
+
+          .problem-copy {
+            transform: none !important;
+          }
         }
 
         @media (max-width: 768px) {
@@ -1852,5 +2744,5 @@ export default function HomeSections() {
         }
       `}</style>
     </>
-  )
+  );
 }

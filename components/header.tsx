@@ -12,32 +12,23 @@ export default function Header() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
-          {/* Logo */}
-          <div className="flex items-center gap-2">
-            <Image src="/keiros-logo.png" alt="KEIROS" width={100} height={20} className="" />
-            
+          {/* Logo + Tagline */}
+          <div className="flex items-center gap-3">
+            <Image src="/keiros-logo.png" alt="Keiros" width={120} height={24} priority />
+           
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
+          {/* Navigation + CTA */}
+          <div className="hidden md:flex items-center gap-8">
             <Link href="#problem" className="text-foreground/80 hover:text-foreground text-sm transition">
               PROBLEM
             </Link>
             <Link href="#solution" className="text-foreground/80 hover:text-foreground text-sm transition">
               SOLUTION
             </Link>
-            <Link href="#developers" className="text-foreground/80 hover:text-foreground text-sm transition">
-              DEVELOPERS
-            </Link>
-            <Link href="#pricing" className="text-foreground/80 hover:text-foreground text-sm transition">
-              PRICING
-            </Link>
-          </nav>
-
-          {/* CTA Button */}
-          <div className="hidden md:block">
+            
             <Link href="#contact" className="px-6 py-2 bg-accent text-accent-foreground rounded-full text-sm font-medium hover:opacity-90 transition inline-flex">
-              Get Started
+              Get Early Access
             </Link>
           </div>
 
@@ -53,6 +44,12 @@ export default function Header() {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden pb-4 space-y-2">
+            <div className="flex items-center gap-3 px-2">
+              <Image src="/keiros-logo.png" alt="Keiros" width={100} height={20} />
+              <span className="text-[11px] text-foreground/70 tracking-[0.08em]">
+                Precision Location. Every Address. Every Floor.
+              </span>
+            </div>
             <Link href="#problem" className="block text-foreground/80 hover:text-foreground text-sm py-2" onClick={() => setMobileMenuOpen(false)}>
               PROBLEM
             </Link>
@@ -61,9 +58,6 @@ export default function Header() {
             </Link>
             <Link href="#developers" className="block text-foreground/80 hover:text-foreground text-sm py-2" onClick={() => setMobileMenuOpen(false)}>
               DEVELOPERS
-            </Link>
-            <Link href="#pricing" className="block text-foreground/80 hover:text-foreground text-sm py-2" onClick={() => setMobileMenuOpen(false)}>
-              PRICING
             </Link>
             <Link href="#contact" className="w-full px-6 py-2 bg-accent text-accent-foreground rounded-full text-sm font-medium mt-4 inline-flex justify-center" onClick={() => setMobileMenuOpen(false)}>
               Get Started
