@@ -468,10 +468,6 @@ export default function HomeSections() {
             />
             <span className="video-sheen" aria-hidden="true" />
             <span className="video-grid" aria-hidden="true" />
-            <div className="video-hud" aria-hidden="true">
-              <span className="hud-dot" />
-              <span className="hud-pill">±3 ft + elevation</span>
-            </div>
           </div>
         </div>
       </section>
@@ -1626,8 +1622,8 @@ export default function HomeSections() {
 
         .accuracy-callout {
           position: absolute;
-          top: 40%;
-          right: -60px;
+          top: 52%;
+          right: 7px;
           padding: 10px 16px;
           white-space: nowrap;
           background: var(--keiros-accent);
@@ -2578,6 +2574,9 @@ export default function HomeSections() {
           .solution-visual {
             position: relative;
             top: auto;
+            height: auto;
+            min-height: 420px;
+            margin-bottom: 32px;
           }
 
           .solution-point {
@@ -2671,15 +2670,10 @@ export default function HomeSections() {
           }
 
           .accuracy-callout {
-            right: auto;
-            left: 50%;
-            top: auto;
-            bottom: -56px;
-            transform: translateX(-50%);
-          }
-
-          .accuracy-callout::before {
-            display: none;
+            right: 61px;
+            top: 53%;
+            font-size: 0.6rem;
+            padding: 8px 12px;
           }
         }
 
