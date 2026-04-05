@@ -1455,7 +1455,7 @@ export default function HomeSections() {
 
         .hero-video {
           width: 100%;
-          height: clamp(260px, 58vw, 620px);
+          height: clamp(420px, 56vw, 620px);
           object-fit: cover;
           display: block;
           transform-origin: center;
@@ -2568,6 +2568,11 @@ export default function HomeSections() {
             grid-template-columns: 1fr;
           }
 
+          .solution-banner {
+            height: 280px;
+            border-radius: 20px;
+          }
+
           .solution-layout,
           .dev-layout,
           .pricing-grid {
@@ -2700,6 +2705,18 @@ export default function HomeSections() {
           .contact-alts {
             flex-direction: column;
             gap: 10px;
+          }
+
+          .video-shell {
+            padding: 16px 12px 32px;
+          }
+
+          .hero-video {
+            height: clamp(480px, 85vw, 620px);
+          }
+
+          .video-frame {
+            border-radius: 16px;
           }
         }
       `}</style>
